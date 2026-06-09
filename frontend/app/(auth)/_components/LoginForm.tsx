@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { FiLock, FiMail } from "react-icons/fi";
 import { loginAction } from "../../../lib/actions/auth-actions";
-import { setAuthToken } from "../../../lib/cookies";
+import { setTokenCookie, storeUserData } from "../../../lib/cookies";
 import { loginSchema } from "./schema";
 
 export default function LoginForm() {
@@ -49,13 +49,20 @@ export default function LoginForm() {
       }
 
       const token = response.data?.token;
+      const user = response.data?.user;
 
       if (!token) {
         setErrorMessage("Token not found from backend response");
         return;
       }
 
-      setAuthToken(token);
+      if (!user) {
+        setErrorMessage("User data not found from backend response");
+        return;
+      }
+
+      await setTokenCookie(token);
+      await storeUserData(user);
 
       router.push("/dashboard");
     } catch {
