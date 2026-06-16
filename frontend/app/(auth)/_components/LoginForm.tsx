@@ -6,11 +6,12 @@ import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { FiLock, FiMail } from "react-icons/fi";
 import { loginAction } from "../../../lib/actions/auth-actions";
-import { setTokenCookie, storeUserData } from "../../../lib/cookies";
+import { useAuth } from "../../../lib/context/AuthContext";
 import { loginSchema } from "./schema";
 
 export default function LoginForm() {
   const router = useRouter();
+  const { login } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -61,8 +62,7 @@ export default function LoginForm() {
         return;
       }
 
-      await setTokenCookie(token);
-      await storeUserData(user);
+      login(token, user);
 
       router.push("/dashboard");
     } catch {
