@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import multer from "multer";
 
-const uploadDirectory = path.join(process.cwd(), "uploads", "profiles");
+const uploadDirectory = path.join(process.cwd(), "public", "profiles");
 
 if (!fs.existsSync(uploadDirectory)) {
   fs.mkdirSync(uploadDirectory, { recursive: true });
@@ -32,6 +32,6 @@ export const uploadProfileImage = multer({
   storage,
   fileFilter,
   limits: {
-    fileSize: 2 * 1024 * 1024,
+    fileSize: 5 * 1024 * 1024,
   },
 });
