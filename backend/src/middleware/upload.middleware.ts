@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import multer from "multer";
 
-const uploadDirectory = path.join(process.cwd(), "public", "profiles");
+const uploadDirectory = path.join(process.cwd(), "uploads", "profile");
 
 if (!fs.existsSync(uploadDirectory)) {
   fs.mkdirSync(uploadDirectory, { recursive: true });

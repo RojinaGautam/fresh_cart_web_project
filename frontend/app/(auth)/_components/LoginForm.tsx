@@ -5,8 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { FiLock, FiMail } from "react-icons/fi";
-import { loginAction } from "../../../lib/actions/auth-actions";
-import { useAuth } from "../../../lib/context/AuthContext";
+import { loginAction } from "../../../lib/actions/auth-action";
+import { useAuth } from "../../../lib/contexts/AuthContext";
 import { loginSchema } from "./schema";
 
 export default function LoginForm() {

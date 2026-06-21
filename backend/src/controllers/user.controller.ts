@@ -97,7 +97,9 @@ export class UserController {
         return ApiResponseHelper.error(res, "Unauthorized", 401);
       }
 
-      const profileImage = req.file ? `/profiles/${req.file.filename}` : undefined;
+      const profileImage = req.file
+        ? `/uploads/profile/${req.file.filename}`
+        : undefined;
       const profileData = UpdateProfileDTO.safeParse({
         ...req.body,
         ...(profileImage ? { profileImage } : {}),
