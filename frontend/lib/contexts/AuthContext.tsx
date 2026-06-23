@@ -25,7 +25,7 @@ type AuthContextValue = {
   checkAuth: () => Promise<FreshCartUser | null>;
   login: (token: string, user: FreshCartUser) => void;
   setUser: (user: FreshCartUser) => void;
-  logout: () => void;
+  logout: (redirectTo?: string) => void;
 };
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -41,8 +41,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setStoredUser(nextUser);
   }, []);
 
-  const logout = useCallback(() => {
+  const logout = useCallback((redirectTo?: string) => {
     clearStoredAuth();
+
+    if (redirectTo) {
+      window.location.replace(redirectTo);
+      return;
+    }
+
     setUserState(null);
   }, []);
 

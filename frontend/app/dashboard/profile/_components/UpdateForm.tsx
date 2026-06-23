@@ -80,13 +80,13 @@ export default function UpdateForm({ user }: { user: FreshCartUser }) {
   };
 
   return (
-    <section className="rounded-lg bg-white p-6 shadow-sm">
+    <section className="rounded-md border border-gray-100 bg-white p-6 shadow-sm">
       <div className="flex items-center gap-3">
         <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-green-100 text-green-700">
           <FiCamera size={20} />
         </span>
         <div>
-          <h1 className="text-xl font-black text-[#10263a]">Profile settings</h1>
+          <h1 className="text-xl font-black text-[#17251c]">Edit personal information</h1>
           <p className="text-sm text-gray-500">
             Update your FreshCart account details.
           </p>
@@ -118,26 +118,47 @@ export default function UpdateForm({ user }: { user: FreshCartUser }) {
           </label>
         </div>
 
-        <div>
-          <label className="mb-2 block text-sm font-bold text-[#10263a]">
-            Full name
-          </label>
-          <input
-            value={fullName}
-            onChange={(event) => setFullName(event.target.value)}
-            className="w-full rounded-md border border-green-100 px-4 py-3 text-sm text-[#10263a] outline-none focus:ring-2 focus:ring-green-500"
-          />
-        </div>
-
-        <div>
-          <label className="mb-2 block text-sm font-bold text-[#10263a]">
-            Phone number
-          </label>
-          <input
-            value={phoneNumber}
-            onChange={(event) => setPhoneNumber(event.target.value)}
-            className="w-full rounded-md border border-green-100 px-4 py-3 text-sm text-[#10263a] outline-none focus:ring-2 focus:ring-green-500"
-          />
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label className="mb-2 block text-xs font-black text-gray-600">
+              Full Name
+            </label>
+            <input
+              value={fullName}
+              onChange={(event) => setFullName(event.target.value)}
+              className="w-full rounded-md border border-green-100 px-4 py-3 text-sm font-medium text-[#17251c] outline-none focus:ring-2 focus:ring-green-500"
+            />
+          </div>
+          <div>
+            <label className="mb-2 block text-xs font-black text-gray-600">
+              Email Address
+            </label>
+            <input
+              value={user.email}
+              readOnly
+              className="w-full cursor-not-allowed rounded-md border border-gray-200 bg-gray-100 px-4 py-3 text-sm font-medium text-gray-600"
+            />
+          </div>
+          <div>
+            <label className="mb-2 block text-xs font-black text-gray-600">
+              Phone Number
+            </label>
+            <input
+              value={phoneNumber}
+              onChange={(event) => setPhoneNumber(event.target.value)}
+              className="w-full rounded-md border border-green-100 px-4 py-3 text-sm font-medium text-[#17251c] outline-none focus:ring-2 focus:ring-green-500"
+            />
+          </div>
+          <div>
+            <label className="mb-2 block text-xs font-black text-gray-600">
+              Date of Birth
+            </label>
+            <input
+              value="March 12, 1994"
+              readOnly
+              className="w-full cursor-not-allowed rounded-md border border-gray-200 bg-gray-100 px-4 py-3 text-sm font-medium text-gray-600"
+            />
+          </div>
         </div>
 
         {error && (

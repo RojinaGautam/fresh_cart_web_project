@@ -31,7 +31,7 @@ export default function ProfilePage() {
         {user && (
           <div className="space-y-5">
             <section className="rounded-md border border-gray-100 bg-white p-5 shadow-sm">
-              <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+              <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
                 <div className="flex flex-col gap-5 sm:flex-row">
                   <div className="relative h-24 w-24 shrink-0">
                     <Avatar
@@ -56,7 +56,7 @@ export default function ProfilePage() {
                         <FiCheckCircle size={12} />
                       </span>
                     </div>
-                    <p className="mt-1 text-xs font-medium text-gray-500">
+                    <p className="mt-1 text-sm font-medium text-gray-500">
                       FreshCart Customer since {formatDate(user.createdAt)}
                     </p>
 
@@ -70,42 +70,6 @@ export default function ProfilePage() {
                     </div>
                   </div>
                 </div>
-
-              </div>
-
-              <div className="mt-6 grid gap-4 sm:grid-cols-2">
-                <div>
-                  <label className="mb-1 block text-[11px] font-black text-gray-500">
-                    Full Name
-                  </label>
-                  <div className="rounded bg-gray-100 px-4 py-3 text-sm font-semibold text-gray-700">
-                    {user.fullName}
-                  </div>
-                </div>
-                <div>
-                  <label className="mb-1 block text-[11px] font-black text-gray-500">
-                    Email Address
-                  </label>
-                  <div className="rounded bg-gray-100 px-4 py-3 text-sm font-semibold text-gray-700">
-                    {user.email}
-                  </div>
-                </div>
-                <div>
-                  <label className="mb-1 block text-[11px] font-black text-gray-500">
-                    Phone Number
-                  </label>
-                  <div className="rounded bg-gray-100 px-4 py-3 text-sm font-semibold text-gray-700">
-                    {user.phoneNumber}
-                  </div>
-                </div>
-                <div>
-                  <label className="mb-1 block text-[11px] font-black text-gray-500">
-                    Date of Birth
-                  </label>
-                  <div className="rounded bg-gray-100 px-4 py-3 text-sm font-semibold text-gray-700">
-                    March 12, 1994
-                  </div>
-                </div>
               </div>
             </section>
 
@@ -113,7 +77,7 @@ export default function ProfilePage() {
               <section className="rounded-md border border-gray-100 bg-white p-5 shadow-sm">
                 <div className="flex items-center justify-between">
                   <h2 className="text-lg font-black text-[#17251c]">
-                    Payment  Address
+                    Payment Address
                   </h2>
                   <button
                     type="button"
@@ -145,7 +109,7 @@ export default function ProfilePage() {
                 </button>
               </section>
 
-              <section className="rounded-md border border-gray-100 bg-white p-5 shadow-sm">
+              <section id="payment-methods" className="scroll-mt-24 rounded-md border border-gray-100 bg-white p-5 shadow-sm">
                 <div className="flex items-center justify-between">
                   <h2 className="text-lg font-black text-[#17251c]">
                     Payment Method

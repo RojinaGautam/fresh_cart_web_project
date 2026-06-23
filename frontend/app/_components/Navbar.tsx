@@ -58,12 +58,16 @@ export default function Navbar({
   user,
   variant,
 }: {
-  user: FreshCartUser;
+  user?: FreshCartUser | null;
   variant: "account" | "storefront";
 }) {
   return (
     <header className="border-b border-gray-100 bg-white">
-      <div className="mx-auto flex min-h-16 max-w-6xl flex-wrap items-center justify-between gap-3 px-5 py-3">
+      <div
+        className={`mx-auto flex min-h-16 w-full flex-wrap items-center justify-between gap-3 px-5 py-3 md:px-8 ${
+          variant === "storefront" ? "max-w-[1500px]" : "max-w-6xl"
+        }`}
+      >
         <Logo />
 
         {variant === "storefront" && (
@@ -73,7 +77,7 @@ export default function Navbar({
           </div>
         )}
 
-        <nav className="hidden items-center gap-6 text-xs font-semibold text-gray-700 md:flex">
+        <nav className="hidden items-center gap-6 text-xs font-medium text-[#26332b] md:flex">
           {navItems.map((item) => (
             <Link key={item.label} href={item.href} className="hover:text-green-700">
               {item.label}
@@ -106,29 +110,34 @@ export default function Navbar({
           >
             <FiShoppingCart size={15} />
           </button>
-          <Link
-            href="/dashboard/profile"
-            aria-label="Go to profile"
-            title="Profile"
-            className={`flex items-center gap-2 rounded-full border border-green-100 bg-green-50 text-xs font-bold text-green-700 transition hover:bg-green-100 ${
-              variant === "storefront"
-                ? "h-8 w-8 justify-center p-0"
-                : "px-2.5 py-1"
-            }`}
-          >
-            {variant === "storefront" ? (
-              <FiUser size={15} />
-            ) : (
-              <>
-                <Avatar user={user} className="h-6 w-6 text-[10px]" />
-                <span>Profile</span>
-              </>
-            )}
-          </Link>
+          {user && (
+            <Link
+              href="/dashboard/profile"
+              aria-label="Go to profile"
+              title="Profile"
+              className={`flex items-center gap-2 rounded-full border border-green-100 bg-green-50 text-xs font-bold text-green-700 transition hover:bg-green-100 ${
+                variant === "storefront"
+                  ? "h-8 w-8 justify-center p-0"
+                  : "px-2.5 py-1"
+              }`}
+            >
+              {variant === "storefront" ? (
+                <FiUser size={15} />
+              ) : (
+                <>
+                  <Avatar user={user} className="h-6 w-6 text-[10px]" />
+                  <span>Profile</span>
+                </>
+              )}
+            </Link>
+          )}
           {variant === "storefront" && (
-            <button className="rounded bg-green-600 px-4 py-2 text-xs font-black text-white transition hover:bg-green-700">
-              Cart
-            </button>
+            <Link
+              href="/login"
+              className="rounded-md bg-[#079b3b] px-4 py-2 text-xs font-bold text-white transition hover:bg-[#087f35]"
+            >
+              Login
+            </Link>
           )}
         </div>
       </div>

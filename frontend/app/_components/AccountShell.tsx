@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import {
   FiCreditCard,
   FiLogOut,
@@ -17,7 +17,7 @@ const accountItems = [
   { href: "/dashboard/profile", label: "Personal Info", icon: FiUser },
   { href: "/dashboard", label: "Order History", icon: FiPackage },
   { href: "/dashboard", label: "Saved Addresses", icon: FiMapPin },
-  { href: "/dashboard/password", label: "Password", icon: FiCreditCard },
+  { href: "/dashboard/profile#payment-methods", label: "Payment Methods", icon: FiCreditCard },
 ];
 
 export { Avatar, getProfileImageUrl };
@@ -30,7 +30,8 @@ function AccountSidebar({ onLogout }: { onLogout: () => void }) {
       <div className="space-y-1">
         {accountItems.map((item) => {
           const Icon = item.icon;
-          const active = pathname === item.href;
+          const active =
+            item.href === "/dashboard/profile" && pathname === item.href;
 
           return (
             <Link
@@ -68,14 +69,12 @@ export default function AccountShell({
   children: React.ReactNode;
   variant?: "account" | "storefront";
 }) {
-  const router = useRouter();
   const { logout, user } = useAuth();
 
   if (!user) return null;
 
   const handleLogout = () => {
-    logout();
-    router.replace("/login");
+    logout("/");
   };
 
   return (
@@ -83,15 +82,17 @@ export default function AccountShell({
       <Navbar user={user} variant={variant} />
 
       {variant === "account" ? (
-        <section className="mx-auto grid max-w-6xl gap-6 px-5 py-8 md:grid-cols-[220px_1fr]">
+        <section className="mx-auto grid w-full max-w-[1500px] gap-6 px-5 py-8 md:grid-cols-[220px_minmax(0,1fr)] md:px-8 lg:gap-8 lg:py-10">
           <AccountSidebar onLogout={handleLogout} />
           <div>{children}</div>
         </section>
       ) : (
-        <section className="mx-auto max-w-6xl px-5 py-6">{children}</section>
+        <section className="mx-auto w-full max-w-[1500px] px-5 py-5 md:px-8">
+          {children}
+        </section>
       )}
 
-      <Footer />
+      <Footer wide />
     </main>
   );
 }
