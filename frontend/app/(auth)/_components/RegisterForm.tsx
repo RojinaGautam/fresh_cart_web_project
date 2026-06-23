@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
-import { registerAction } from "../../../lib/actions/auth-actions";
+import { registerAction } from "../../../lib/actions/auth-action";
 import { registerSchema } from "./schema";
 
 export default function RegisterForm() {

@@ -1,6 +1,7 @@
 "use server";
 
 import { cookies } from "next/headers";
+import { FreshCartUser } from "./api/auth";
 
 export async function setTokenCookie(token: string) {
   const cookieStore = await cookies();
@@ -18,7 +19,7 @@ export async function getTokenCookie() {
   return cookieStore.get("auth_token")?.value;
 }
 
-export async function storeUserData(userData: any) {
+export async function storeUserData(userData: FreshCartUser) {
   const cookieStore = await cookies();
 
   cookieStore.set({

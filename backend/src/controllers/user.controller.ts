@@ -1,8 +1,14 @@
 import { UserService } from "../services/user.service";
 import { z } from "zod";
-import { CreateUserDTO, LoginUserDTO } from "../dtos/user.dto";
+import {
+  CreateUserDTO,
+  LoginUserDTO,
+  UpdatePasswordDTO,
+  UpdateProfileDTO,
+} from "../dtos/user.dto";
 import { Request, Response } from "express";
 import { ApiResponseHelper } from "../uttils/apihelper.util";
+import { AuthRequest } from "../middleware/auth.middleware";
 
 const userService = new UserService();
 
@@ -53,6 +59,98 @@ export class UserController {
         res,
         { user, token },
         "Login successful",
+      );
+    } catch (error: Error | any | unknown) {
+      return ApiResponseHelper.error(
+        res,
+        error.message || "Internal Server Error",
+        error.status || 500,
+      );
+    }
+  }
+
+  async whoAmI(req: AuthRequest, res: Response) {
+    try {
+      if (!req.user?.id) {
+        return ApiResponseHelper.error(res, "Unauthorized", 401);
+      }
+
+      const user = await userService.getCurrentUser(req.user.id);
+
+      return ApiResponseHelper.success(
+        res,
+        user,
+        "Authenticated user fetched successfully",
+      );
+    } catch (error: Error | any | unknown) {
+      return ApiResponseHelper.error(
+        res,
+        error.message || "Internal Server Error",
+        error.status || 500,
+      );
+    }
+  }
+
+  async updateProfile(req: AuthRequest, res: Response) {
+    try {
+      if (!req.user?.id) {
+        return ApiResponseHelper.error(res, "Unauthorized", 401);
+      }
+
+      const profileImage = req.file
+        ? `/uploads/profile/${req.file.filename}`
+        : undefined;
+      const profileData = UpdateProfileDTO.safeParse({
+        ...req.body,
+        ...(profileImage ? { profileImage } : {}),
+      });
+
+      if (!profileData.success) {
+        return ApiResponseHelper.error(
+          res,
+          z.prettifyError(profileData.error),
+          400,
+        );
+      }
+
+      const user = await userService.updateProfile(req.user.id, profileData.data);
+
+      return ApiResponseHelper.success(
+        res,
+        user,
+        "Profile updated successfully",
+      );
+    } catch (error: Error | any | unknown) {
+      return ApiResponseHelper.error(
+        res,
+        error.message || "Internal Server Error",
+        error.status || 500,
+      );
+    }
+  }
+
+  async updatePassword(req: AuthRequest, res: Response) {
+    try {
+      if (!req.user?.id) {
+        return ApiResponseHelper.error(res, "Unauthorized", 401);
+      }
+
+      const passwordData = UpdatePasswordDTO.safeParse(req.body);
+
+      if (!passwordData.success) {
+        return ApiResponseHelper.error(
+          res,
+          z.prettifyError(passwordData.error),
+          400,
+        );
+      }
+
+      const user = await userService.updatePassword(req.user.id, passwordData.data);
+
+      return ApiResponseHelper.success(
+        res,
+        user,
+        "Password updated successfully",
       );
     } catch (error: Error | any | unknown) {
       return ApiResponseHelper.error(
