@@ -12,3 +12,5 @@ frontend/.env.local
 
 backend/node_modules
 backend/.env
+backend/public/profiles
+backend/uploads/profile
