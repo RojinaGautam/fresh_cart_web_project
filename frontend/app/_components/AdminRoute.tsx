@@ -17,16 +17,19 @@ export default function AdminRoute({ children }: { children: ReactNode }) {
     }
 
     if (user?.role !== "admin") {
-      router.replace("/dashboard");
+      router.replace("/");
     }
   }, [isAuthenticated, loading, router, user?.role]);
 
   if (loading) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-[#f5fbf3] px-6">
-        <div className="rounded-lg bg-white px-8 py-6 text-center shadow-sm">
-          <p className="text-sm font-semibold text-green-700">
+      <main className="flex min-h-screen items-center justify-center bg-slate-100 px-6">
+        <div className="rounded-2xl border border-slate-200 bg-white px-8 py-6 text-center shadow-sm">
+          <p className="text-sm font-black text-emerald-700">
             Checking admin access...
+          </p>
+          <p className="mt-1 text-xs font-medium text-slate-500">
+            Verifying your FreshCart role.
           </p>
         </div>
       </main>

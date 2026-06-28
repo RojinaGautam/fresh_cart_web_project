@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import AdminRoute from "../_components/AdminRoute";
 import { useAuth } from "../../lib/contexts/AuthContext";
 import Footer from "./_components/Footer";
@@ -9,16 +9,24 @@ import Sidebar from "./_components/Sidebar";
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   const { logout, user } = useAuth();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
     <AdminRoute>
-      <div className="flex min-h-screen flex-col bg-[#f4f7f2]">
-        <Header user={user} onLogout={() => logout("/")} />
-        <main className="mx-auto grid w-full max-w-[1500px] flex-1 gap-5 px-5 py-6 md:grid-cols-[220px_minmax(0,1fr)] md:px-8">
-          <Sidebar />
-          {children}
-        </main>
-        <Footer />
+      <div className="min-h-screen bg-slate-100 text-slate-950 lg:grid lg:grid-cols-[280px_minmax(0,1fr)]">
+        <Sidebar
+          user={user}
+          isOpen={isSidebarOpen}
+          onClose={() => setIsSidebarOpen(false)}
+          onLogout={() => logout("/")}
+        />
+        <div className="flex min-w-0 flex-col">
+          <Header user={user} onMenuClick={() => setIsSidebarOpen(true)} />
+          <main className="mx-auto w-full max-w-[1500px] flex-1 px-4 py-6 md:px-6 lg:px-8">
+            {children}
+          </main>
+          <Footer />
+        </div>
       </div>
     </AdminRoute>
   );

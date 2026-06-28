@@ -28,17 +28,17 @@ export default function UserFormModal({
     <Modal>
       <form
         onSubmit={onSubmit}
-        className="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-md bg-white shadow-xl"
+        className="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white shadow-2xl"
       >
-        <div className="flex items-start justify-between gap-4 border-b border-gray-100 px-6 py-5">
+        <div className="flex items-start justify-between gap-4 border-b border-slate-100 px-6 py-5">
           <div>
-            <p className="text-xs font-bold uppercase tracking-wide text-green-700">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-600">
               {mode === "edit" ? "Edit Account" : "Create Account"}
             </p>
-            <h2 className="mt-1 text-xl font-bold text-[#17251d]">
+            <h2 className="mt-1 text-xl font-black text-slate-950">
               {mode === "edit" ? "Update User Details" : "Add New User"}
             </h2>
-            <p className="mt-1 text-sm text-gray-500">
+            <p className="mt-1 text-sm font-medium text-slate-500">
               {mode === "edit"
                 ? "Leave password blank to keep the current password."
                 : "Create a customer or admin account."}
@@ -47,7 +47,7 @@ export default function UserFormModal({
           <button
             type="button"
             onClick={onClose}
-            className="flex h-9 w-9 items-center justify-center rounded-md border border-gray-200 text-gray-500 hover:bg-gray-50"
+            className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 text-slate-500 transition hover:bg-slate-100 active:scale-[0.96]"
             aria-label="Close form"
           >
             <FiX size={17} />
@@ -56,30 +56,30 @@ export default function UserFormModal({
 
         <div className="grid gap-4 px-6 py-5 md:grid-cols-2">
           <label className="block">
-            <span className="text-xs font-bold text-gray-700">Full Name</span>
+            <span className="text-xs font-black text-slate-700">Full Name</span>
             <input
               value={form.fullName}
               onChange={(event) =>
                 onChange({ ...form, fullName: event.target.value })
               }
-              className="mt-1 w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-3 text-sm font-medium outline-none focus:border-green-500 focus:ring-2 focus:ring-green-100"
+              className="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm font-semibold outline-none transition focus:border-emerald-400 focus:bg-white focus:ring-4 focus:ring-emerald-100"
             />
           </label>
 
           <label className="block">
-            <span className="text-xs font-bold text-gray-700">Email</span>
+            <span className="text-xs font-black text-slate-700">Email</span>
             <input
               type="email"
               value={form.email}
               onChange={(event) =>
                 onChange({ ...form, email: event.target.value })
               }
-              className="mt-1 w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-3 text-sm font-medium outline-none focus:border-green-500 focus:ring-2 focus:ring-green-100"
+              className="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm font-semibold outline-none transition focus:border-emerald-400 focus:bg-white focus:ring-4 focus:ring-emerald-100"
             />
           </label>
 
           <label className="block">
-            <span className="text-xs font-bold text-gray-700">
+            <span className="text-xs font-black text-slate-700">
               Phone Number
             </span>
             <input
@@ -87,12 +87,12 @@ export default function UserFormModal({
               onChange={(event) =>
                 onChange({ ...form, phoneNumber: event.target.value })
               }
-              className="mt-1 w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-3 text-sm font-medium outline-none focus:border-green-500 focus:ring-2 focus:ring-green-100"
+              className="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm font-semibold outline-none transition focus:border-emerald-400 focus:bg-white focus:ring-4 focus:ring-emerald-100"
             />
           </label>
 
           <label className="block">
-            <span className="text-xs font-bold text-gray-700">Role</span>
+            <span className="text-xs font-black text-slate-700">Role</span>
             <select
               value={form.role}
               onChange={(event) =>
@@ -101,7 +101,7 @@ export default function UserFormModal({
                   role: event.target.value as "admin" | "user",
                 })
               }
-              className="mt-1 w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-3 text-sm font-bold text-[#17251d] outline-none focus:border-green-500 focus:ring-2 focus:ring-green-100"
+              className="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm font-black text-slate-950 outline-none transition focus:border-emerald-400 focus:bg-white focus:ring-4 focus:ring-emerald-100"
             >
               <option value="user">User</option>
               <option value="admin">Admin</option>
@@ -109,7 +109,7 @@ export default function UserFormModal({
           </label>
 
           <label className="block md:col-span-2">
-            <span className="text-xs font-bold text-gray-700">Password</span>
+            <span className="text-xs font-black text-slate-700">Password</span>
             <input
               type="password"
               value={form.password}
@@ -119,13 +119,13 @@ export default function UserFormModal({
               placeholder={
                 mode === "edit" ? "Leave blank to keep password" : "Password"
               }
-              className="mt-1 w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-3 text-sm font-medium outline-none focus:border-green-500 focus:ring-2 focus:ring-green-100"
+              className="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm font-semibold outline-none transition focus:border-emerald-400 focus:bg-white focus:ring-4 focus:ring-emerald-100"
             />
           </label>
         </div>
 
         {error && (
-          <p className="mx-6 rounded-md bg-red-50 px-3 py-2 text-sm font-semibold text-red-700">
+          <p className="mx-6 rounded-xl border border-red-100 bg-red-50 px-3 py-2 text-sm font-semibold text-red-700">
             {error}
           </p>
         )}
@@ -134,14 +134,14 @@ export default function UserFormModal({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-md border border-gray-200 px-4 py-2 text-sm font-bold text-gray-600 hover:bg-gray-50"
+            className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-black text-slate-600 transition hover:bg-slate-100 active:scale-[0.98]"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={saving}
-            className="flex items-center gap-2 rounded-md bg-[#079b3b] px-4 py-2 text-sm font-bold text-white hover:bg-[#087f35] disabled:cursor-not-allowed disabled:opacity-70"
+            className="flex items-center gap-2 rounded-xl bg-emerald-500 px-4 py-2 text-sm font-black text-white shadow-lg shadow-emerald-950/10 transition hover:bg-emerald-600 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70"
           >
             <FiSave size={15} />
             {saving

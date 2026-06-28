@@ -183,17 +183,17 @@ export default function AdminUsersPage() {
   }, [meta]);
 
   return (
-    <section className="space-y-5">
-      <div className="rounded-md border border-gray-200 bg-white p-5 shadow-sm">
+    <section className="space-y-6">
+      <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p className="text-xs font-bold uppercase tracking-wide text-green-700">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-600">
               Admin Dashboard
             </p>
-            <h1 className="mt-1 text-2xl font-bold text-[#17251d]">
+            <h1 className="mt-1 text-2xl font-black text-slate-950">
               User Management
             </h1>
-            <p className="mt-1 text-sm text-gray-500">
+            <p className="mt-1 text-sm font-medium text-slate-500">
               Search, view, create, edit, and delete FreshCart accounts.
             </p>
           </div>
@@ -211,13 +211,13 @@ export default function AdminUsersPage() {
                   setPage(1);
                 }}
                 placeholder="Search by ID, name, or email..."
-                className="w-full rounded-md border border-gray-200 bg-gray-50 px-10 py-3 text-sm font-medium outline-none focus:border-green-500 focus:ring-2 focus:ring-green-100"
+                className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-10 text-sm font-semibold outline-none transition focus:border-emerald-400 focus:bg-white focus:ring-4 focus:ring-emerald-100"
               />
             </div>
             <button
               type="button"
               onClick={openCreateModal}
-              className="flex items-center justify-center gap-2 rounded-md bg-[#079b3b] px-4 py-3 text-sm font-bold text-white hover:bg-[#087f35]"
+              className="flex h-11 items-center justify-center gap-2 rounded-xl bg-emerald-500 px-4 text-sm font-black text-white shadow-lg shadow-emerald-950/10 transition hover:bg-emerald-600 active:scale-[0.98]"
             >
               <FiPlus size={16} />
               Create User
@@ -227,37 +227,37 @@ export default function AdminUsersPage() {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-3">
-        <div className="rounded-md border border-gray-200 bg-white p-5 shadow-sm">
-          <p className="text-xs font-bold uppercase text-gray-500">
+        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <p className="text-xs font-black uppercase text-slate-500">
             Total Users
           </p>
-          <p className="mt-2 text-3xl font-bold text-[#17251d]">{meta.total}</p>
+          <p className="mt-2 text-3xl font-black text-slate-950">{meta.total}</p>
         </div>
-        <div className="rounded-md border border-gray-200 bg-white p-5 shadow-sm">
-          <p className="text-xs font-bold uppercase text-gray-500">
+        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <p className="text-xs font-black uppercase text-slate-500">
             Current Page
           </p>
-          <p className="mt-2 text-3xl font-bold text-[#17251d]">{meta.page}</p>
+          <p className="mt-2 text-3xl font-black text-slate-950">{meta.page}</p>
         </div>
-        <div className="rounded-md border border-gray-200 bg-white p-5 shadow-sm">
-          <p className="text-xs font-bold uppercase text-gray-500">
+        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <p className="text-xs font-black uppercase text-slate-500">
             Admins Visible
           </p>
-          <p className="mt-2 text-3xl font-bold text-[#17251d]">
+          <p className="mt-2 text-3xl font-black text-slate-950">
             {users.filter((user) => user.role === "admin").length}
           </p>
         </div>
       </div>
 
       {error && (
-        <div className="flex items-start gap-3 rounded-md border border-red-100 bg-red-50 p-4 text-sm font-medium text-red-700">
+        <div className="flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700 shadow-sm">
           <FiAlertTriangle className="mt-0.5" size={16} />
           <span>{error}</span>
         </div>
       )}
 
       {successMessage && (
-        <p className="rounded-md bg-green-50 px-4 py-3 text-sm font-semibold text-green-700">
+        <p className="rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700 shadow-sm">
           {successMessage}
         </p>
       )}
