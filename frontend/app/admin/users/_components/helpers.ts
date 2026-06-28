@@ -1,4 +1,4 @@
-import { AdminUserFormPayload } from "../../../../lib/api/admin-users";
+import { AdminUserFormPayload } from "../../../../lib/api/admin/user";
 
 export const emptyUserForm: AdminUserFormPayload = {
   fullName: "",

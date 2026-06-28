@@ -2,6 +2,7 @@
 
 import { FiAlertTriangle } from "react-icons/fi";
 import { FreshCartUser } from "../../../../lib/api/auth";
+import Modal from "../../_components/Modal";
 
 export default function DeleteUserModal({
   user,
@@ -15,7 +16,7 @@ export default function DeleteUserModal({
   onConfirm: () => void;
 }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/35 px-4">
+    <Modal>
       <div className="w-full max-w-md rounded-md bg-white p-6 shadow-xl">
         <div className="flex items-start gap-3">
           <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-red-50 text-red-600">
@@ -48,6 +49,6 @@ export default function DeleteUserModal({
           </button>
         </div>
       </div>
-    </div>
+    </Modal>
   );
 }

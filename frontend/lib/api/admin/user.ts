@@ -1,6 +1,6 @@
-import axiosInstance from "./axios-instance";
-import { API_ENDPOINTS } from "./endpoints";
-import { FreshCartUser } from "./auth";
+import axiosInstance from "../axios-instance";
+import { FreshCartUser } from "../auth";
+import { API_ENDPOINTS } from "../endpoints";
 
 export type AdminUserFormPayload = {
   fullName: string;

@@ -2,7 +2,8 @@
 
 import { FormEvent } from "react";
 import { FiSave, FiX } from "react-icons/fi";
-import { AdminUserFormPayload } from "../../../../lib/api/admin-users";
+import { AdminUserFormPayload } from "../../../../lib/api/admin/user";
+import Modal from "../../_components/Modal";
 
 type UserFormModalProps = {
   form: AdminUserFormPayload;
@@ -24,7 +25,7 @@ export default function UserFormModal({
   onSubmit,
 }: UserFormModalProps) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/35 px-4 py-6">
+    <Modal>
       <form
         onSubmit={onSubmit}
         className="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-md bg-white shadow-xl"
@@ -151,6 +152,6 @@ export default function UserFormModal({
           </button>
         </div>
       </form>
-    </div>
+    </Modal>
   );
 }

@@ -8,10 +8,10 @@ import {
   FiTrash2,
   FiUsers,
 } from "react-icons/fi";
-import { AdminUsersMeta } from "../../../../lib/api/admin-users";
+import { AdminUsersMeta } from "../../../../lib/api/admin/user";
 import { FreshCartUser } from "../../../../lib/api/auth";
 
-export default function UsersTable({
+export default function UserTable({
   users,
   meta,
   loading,

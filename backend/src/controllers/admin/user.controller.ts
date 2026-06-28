@@ -3,9 +3,9 @@ import { z } from "zod";
 import {
   AdminCreateUserDTO,
   AdminUpdateUserDTO,
-} from "../dtos/user.dto";
-import { AdminUserService } from "../services/admin-user.service";
-import { ApiResponseHelper } from "../uttils/apihelper.util";
+} from "../../dtos/user.dto";
+import { AdminUserService } from "../../services/admin-user.service";
+import { ApiResponseHelper } from "../../uttils/apihelper.util";
 
 const adminUserService = new AdminUserService();
 

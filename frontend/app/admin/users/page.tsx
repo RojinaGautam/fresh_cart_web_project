@@ -10,7 +10,7 @@ import {
   getAdminUserApi,
   getAdminUsersApi,
   updateAdminUserApi,
-} from "../../../lib/api/admin-users";
+} from "../../../lib/api/admin/user";
 import { FreshCartUser } from "../../../lib/api/auth";
 import DeleteUserModal from "./_components/DeleteUserModal";
 import {
@@ -19,7 +19,7 @@ import {
   validateUserForm,
 } from "./_components/helpers";
 import UserFormModal from "./_components/UserFormModal";
-import UsersTable from "./_components/UsersTable";
+import UserTable from "./_components/UserTable";
 import ViewUserModal from "./_components/ViewUserModal";
 
 export default function AdminUsersPage() {
@@ -262,7 +262,7 @@ export default function AdminUsersPage() {
         </p>
       )}
 
-      <UsersTable
+      <UserTable
         users={users}
         meta={meta}
         loading={loading}

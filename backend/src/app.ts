@@ -1,7 +1,7 @@
 import express, { Application, NextFunction, Request, Response } from "express";
 import cors from "cors";
 import path from "path";
-import adminUserRoutes from "./routes/admin-user.route";
+import adminUserRoutes from "./routes/admin/user.route";
 import userRoutes from "./routes/user.route";
 
 const app: Application = express();

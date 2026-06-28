@@ -2,6 +2,7 @@
 
 import { FiCalendar, FiMail, FiPhone, FiShield, FiUser, FiX } from "react-icons/fi";
 import { FreshCartUser } from "../../../../lib/api/auth";
+import Modal from "../../_components/Modal";
 
 export default function ViewUserModal({
   user,
@@ -25,7 +26,7 @@ export default function ViewUserModal({
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/35 px-4 py-6">
+    <Modal>
       <div className="w-full max-w-xl rounded-md bg-white shadow-xl">
         <div className="flex items-start justify-between gap-4 border-b border-gray-100 px-6 py-5">
           <div className="flex items-center gap-4">
@@ -76,6 +77,6 @@ export default function ViewUserModal({
           })}
         </div>
       </div>
-    </div>
+    </Modal>
   );
 }

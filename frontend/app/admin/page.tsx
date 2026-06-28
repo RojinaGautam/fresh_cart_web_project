@@ -11,7 +11,7 @@ import {
   FiShoppingBag,
   FiUsers,
 } from "react-icons/fi";
-import { getAdminUsersApi } from "../../lib/api/admin-users";
+import { getAdminUsersApi } from "../../lib/api/admin/user";
 import { FreshCartUser } from "../../lib/api/auth";
 
 const getErrorMessage = (error: unknown, fallback: string) => {
