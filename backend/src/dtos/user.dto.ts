@@ -38,3 +38,26 @@ export const UpdatePasswordDTO = z.object({
 });
 
 export type UpdatePasswordDTO = z.infer<typeof UpdatePasswordDTO>;
+
+const AdminUserBaseDTO = z.object({
+  fullName: z.string().min(1, "Full name is required"),
+  email: z.string().email("Invalid email address"),
+  phoneNumber: z
+    .string()
+    .min(10, "Phone number must be at least 10 digits long"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  role: z.enum(["admin", "user"]).default("user"),
+});
+
+export const AdminCreateUserDTO = AdminUserBaseDTO;
+
+export type AdminCreateUserDTO = z.infer<typeof AdminCreateUserDTO>;
+
+export const AdminUpdateUserDTO = AdminUserBaseDTO.partial().refine(
+  (data) => Object.keys(data).length > 0,
+  {
+    message: "At least one field is required",
+  },
+);
+
+export type AdminUpdateUserDTO = z.infer<typeof AdminUpdateUserDTO>;

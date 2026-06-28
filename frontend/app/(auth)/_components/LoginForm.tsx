@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
-import { FiLock, FiMail } from "react-icons/fi";
+import { FiLock, FiMail, FiShield, FiUser } from "react-icons/fi";
 import { loginAction } from "../../../lib/actions/auth-action";
 import { useAuth } from "../../../lib/contexts/AuthContext";
 import { loginSchema } from "./schema";
@@ -12,6 +12,7 @@ import { loginSchema } from "./schema";
 export default function LoginForm() {
   const router = useRouter();
   const { login } = useAuth();
+  const [loginMode, setLoginMode] = useState<"user" | "admin">("user");
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -62,9 +63,14 @@ export default function LoginForm() {
         return;
       }
 
+      if (loginMode === "admin" && user.role !== "admin") {
+        setErrorMessage("This account does not have admin access");
+        return;
+      }
+
       login(token, user);
 
-      router.push("/dashboard");
+      router.push(user.role === "admin" ? "/admin/users" : "/dashboard");
     } catch {
       setErrorMessage("Something went wrong. Please try again.");
     } finally {
@@ -106,11 +112,38 @@ export default function LoginForm() {
                 <h2 className="text-2xl font-bold text-black">Welcome Back</h2>
 
                 <p className="mt-1 text-sm text-gray-600">
-                  Login to access your fresh groceries
+                  Choose your account type to continue
                 </p>
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-5">
+                <div className="grid grid-cols-2 gap-2 rounded-xl bg-white/70 p-1">
+                  <button
+                    type="button"
+                    onClick={() => setLoginMode("user")}
+                    className={`flex items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-bold transition ${
+                      loginMode === "user"
+                        ? "bg-[#079b3b] text-white shadow-sm"
+                        : "text-gray-600 hover:bg-white"
+                    }`}
+                  >
+                    <FiUser size={15} />
+                    Login as User
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setLoginMode("admin")}
+                    className={`flex items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-bold transition ${
+                      loginMode === "admin"
+                        ? "bg-[#079b3b] text-white shadow-sm"
+                        : "text-gray-600 hover:bg-white"
+                    }`}
+                  >
+                    <FiShield size={15} />
+                    Login as Admin
+                  </button>
+                </div>
+
                 {/* Email */}
                 <div>
                   <label className="mb-2 block text-sm font-bold text-[#10263a]">
@@ -191,7 +224,11 @@ export default function LoginForm() {
                   disabled={loading}
                   className="w-full rounded-md bg-green-500 py-3 font-bold text-white transition hover:bg-green-600 disabled:cursor-not-allowed disabled:opacity-70"
                 >
-                  {loading ? "Signing in..." : "Sign In"}
+                  {loading
+                    ? "Signing in..."
+                    : loginMode === "admin"
+                      ? "Sign In as Admin"
+                      : "Sign In as User"}
                 </button>
               </form>
 

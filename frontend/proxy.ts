@@ -4,8 +4,9 @@ export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const token = request.cookies.get("auth_token")?.value;
   const isDashboardRoute = pathname.startsWith("/dashboard");
+  const isAdminRoute = pathname.startsWith("/admin");
 
-  if (!token && isDashboardRoute) {
+  if (!token && (isDashboardRoute || isAdminRoute)) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
@@ -13,5 +14,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/login", "/register"],
+  matcher: ["/dashboard/:path*", "/admin/:path*", "/login", "/register"],
 };
