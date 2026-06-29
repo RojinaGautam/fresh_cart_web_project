@@ -23,7 +23,7 @@ export default function DeleteUserModal({
             <FiAlertTriangle size={20} />
           </span>
           <div>
-            <h2 className="text-lg font-black text-slate-950">Delete User</h2>
+            <h2 className="text-lg font-semibold text-slate-950">Delete User</h2>
             <p className="mt-1 text-sm font-medium leading-6 text-slate-600">
               This will permanently delete {user.fullName}. This action cannot
               be undone.
@@ -35,7 +35,7 @@ export default function DeleteUserModal({
           <button
             type="button"
             onClick={onCancel}
-            className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-black text-slate-600 transition hover:bg-slate-100 active:scale-[0.98]"
+            className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-100 active:scale-[0.98]"
           >
             Cancel
           </button>
@@ -43,7 +43,7 @@ export default function DeleteUserModal({
             type="button"
             onClick={onConfirm}
             disabled={deleting}
-            className="rounded-xl bg-red-600 px-4 py-2 text-sm font-black text-white shadow-lg shadow-red-950/10 transition hover:bg-red-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70"
+            className="rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-red-950/10 transition hover:bg-red-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70"
           >
             {deleting ? "Deleting..." : "Delete"}
           </button>
