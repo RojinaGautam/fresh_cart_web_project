@@ -12,7 +12,7 @@ export default function AdminRoute({ children }: { children: ReactNode }) {
     if (loading) return;
 
     if (!isAuthenticated) {
-      router.replace("/login");
+      router.replace("/admin/login");
       return;
     }
 
