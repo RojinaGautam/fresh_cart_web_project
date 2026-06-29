@@ -131,7 +131,7 @@ export default function Navbar({
               )}
             </Link>
           )}
-          {variant === "storefront" && (
+          {variant === "storefront" && !user && (
             <Link
               href="/login"
               className="rounded-md bg-[#079b3b] px-4 py-2 text-xs font-bold text-white transition hover:bg-[#087f35]"

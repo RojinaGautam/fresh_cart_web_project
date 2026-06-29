@@ -8,6 +8,12 @@ import { UserMongoRepository } from "../repositories/user.repository";
 
 const userRepository = new UserMongoRepository();
 
+const isDuplicateKeyError = (error: unknown) =>
+  typeof error === "object" &&
+  error !== null &&
+  "code" in error &&
+  (error as { code?: number }).code === 11000;
+
 export type PublicUser = {
   id: string;
   fullName: string;
@@ -44,10 +50,20 @@ export class UserService {
     // Hash password
     const hashedPassword = await bcryptjs.hash(userData.password, 10);
 
-    const user = await userRepository.createUser({
-      ...userData,
-      password: hashedPassword,
-    });
+    let user: IUser;
+
+    try {
+      user = await userRepository.createUser({
+        ...userData,
+        password: hashedPassword,
+      });
+    } catch (error) {
+      if (isDuplicateKeyError(error)) {
+        throw new HttpException(400, "Email already exists");
+      }
+
+      throw error;
+    }
 
     return this.toPublicUser(user);
   }

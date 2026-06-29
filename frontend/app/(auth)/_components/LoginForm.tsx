@@ -3,15 +3,20 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
-import { FiLock, FiMail } from "react-icons/fi";
+import { FormEvent, useEffect, useState } from "react";
+import { FiLock, FiMail, FiShield, FiUser } from "react-icons/fi";
 import { loginAction } from "../../../lib/actions/auth-action";
 import { useAuth } from "../../../lib/contexts/AuthContext";
 import { loginSchema } from "./schema";
 
-export default function LoginForm() {
+export default function LoginForm({
+  mode = "user",
+}: {
+  mode?: "user" | "admin";
+}) {
   const router = useRouter();
-  const { login } = useAuth();
+  const { login, logout, user } = useAuth();
+  const loginMode = mode;
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -20,6 +25,12 @@ export default function LoginForm() {
 
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (mode === "user" && user?.role === "admin") {
+      logout();
+    }
+  }, [logout, mode, user?.role]);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -62,9 +73,19 @@ export default function LoginForm() {
         return;
       }
 
+      if (loginMode === "admin" && user.role !== "admin") {
+        setErrorMessage("This account does not have admin access");
+        return;
+      }
+
+      if (loginMode === "user" && user.role === "admin") {
+        setErrorMessage("Please use the admin login page for this account.");
+        return;
+      }
+
       login(token, user);
 
-      router.push("/dashboard");
+      router.push(user.role === "admin" ? "/admin" : "/");
     } catch {
       setErrorMessage("Something went wrong. Please try again.");
     } finally {
@@ -73,10 +94,10 @@ export default function LoginForm() {
   };
 
   return (
-    <main className="h-[100dvh] bg-white">
-      <section className="mx-auto flex h-full overflow-hidden bg-white">
+    <main className="min-h-[100dvh] bg-slate-100">
+      <section className="mx-auto flex min-h-[100dvh] overflow-hidden bg-white">
         {/* LEFT IMAGE SIDE */}
-        <div className="relative hidden h-full w-[52%] lg:block">
+        <div className="relative hidden min-h-[100dvh] w-[52%] lg:block">
           <Image
             src="/login.png"
             alt="Fresh vegetables"
@@ -101,26 +122,70 @@ export default function LoginForm() {
               />
             </div>
 
-            <div className="rounded-[36px] bg-[#c3d2c3] px-8 py-10 shadow-md md:px-10">
+            <div className="rounded-3xl border border-slate-200 bg-white px-8 py-10 shadow-xl md:px-10">
               <div className="mb-7 text-center">
-                <h2 className="text-2xl font-bold text-black">Welcome Back</h2>
+                <p className="text-xs font-black uppercase tracking-[0.2em] text-emerald-600">
+                  {mode === "admin" ? "FreshCart Admin" : "FreshCart Access"}
+                </p>
+                <h2 className="mt-2 text-3xl font-black text-slate-950">
+                  Welcome Back
+                </h2>
 
-                <p className="mt-1 text-sm text-gray-600">
-                  Login to access your fresh groceries
+                <p className="mt-2 text-sm font-medium text-slate-500">
+                  {mode === "admin"
+                    ? "Sign in with an administrator account"
+                    : "Sign in with your customer account"}
                 </p>
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-5">
+                <div className="grid grid-cols-2 gap-2 rounded-2xl bg-slate-100 p-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (mode === "admin") {
+                        router.push("/login");
+                        return;
+                      }
+                    }}
+                    className={`flex min-h-11 items-center justify-center gap-2 rounded-xl px-3 py-2 text-sm font-black transition active:scale-[0.98] ${
+                      loginMode === "user"
+                        ? "bg-emerald-500 text-white shadow-sm"
+                        : "text-slate-600 hover:bg-white"
+                    }`}
+                  >
+                    <FiUser size={15} />
+                    Login as User
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (mode === "user") {
+                        router.push("/admin/login");
+                        return;
+                      }
+                    }}
+                    className={`flex min-h-11 items-center justify-center gap-2 rounded-xl px-3 py-2 text-sm font-black transition active:scale-[0.98] ${
+                      loginMode === "admin"
+                        ? "bg-slate-950 text-white shadow-sm"
+                        : "text-slate-600 hover:bg-white"
+                    }`}
+                  >
+                    <FiShield size={15} />
+                    Login as Admin
+                  </button>
+                </div>
+
                 {/* Email */}
                 <div>
-                  <label className="mb-2 block text-sm font-bold text-[#10263a]">
+                  <label className="mb-2 block text-sm font-black text-slate-800">
                     Email Address
                   </label>
 
                   <div className="relative">
                     <FiMail
                       size={18}
-                      className="absolute left-3 top-1/2 -translate-y-1/2 text-green-600"
+                      className="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-600"
                     />
 
                     <input
@@ -128,7 +193,7 @@ export default function LoginForm() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="name@example.com"
-                      className="w-full rounded-md border border-gray-200 bg-white px-10 py-3 text-sm text-black outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full rounded-xl border border-slate-200 bg-slate-50 px-10 py-3 text-sm font-semibold text-slate-950 outline-none transition focus:border-emerald-400 focus:bg-white focus:ring-4 focus:ring-emerald-100"
                     />
                   </div>
                 </div>
@@ -136,13 +201,13 @@ export default function LoginForm() {
                 {/* Password */}
                 <div>
                   <div className="mb-2 flex items-center justify-between">
-                    <label className="block text-sm font-bold text-[#10263a]">
+                    <label className="block text-sm font-black text-slate-800">
                       Password
                     </label>
 
                     <Link
                       href="#"
-                      className="text-xs font-semibold text-green-700 hover:underline"
+                      className="text-xs font-bold text-emerald-700 hover:underline"
                     >
                       Forgot password?
                     </Link>
@@ -151,7 +216,7 @@ export default function LoginForm() {
                   <div className="relative">
                     <FiLock
                       size={18}
-                      className="absolute left-3 top-1/2 -translate-y-1/2 text-green-600"
+                      className="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-600"
                     />
 
                     <input
@@ -159,7 +224,7 @@ export default function LoginForm() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="********"
-                      className="w-full rounded-md border border-gray-200 bg-white px-10 py-3 text-sm text-black outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full rounded-xl border border-slate-200 bg-slate-50 px-10 py-3 text-sm font-semibold text-slate-950 outline-none transition focus:border-emerald-400 focus:bg-white focus:ring-4 focus:ring-emerald-100"
                     />
                   </div>
                 </div>
@@ -174,14 +239,14 @@ export default function LoginForm() {
                     className="h-4 w-4 accent-green-600"
                   />
 
-                  <label htmlFor="remember" className="text-sm text-gray-700">
+                  <label htmlFor="remember" className="text-sm font-medium text-slate-600">
                     Remember Me
                   </label>
                 </div>
 
                 {/* Error Message */}
                 {errorMessage && (
-                  <p className="rounded-md bg-red-100 px-3 py-2 text-center text-sm font-medium text-red-700">
+                  <p className="rounded-xl border border-red-100 bg-red-50 px-3 py-2 text-center text-sm font-semibold text-red-700">
                     {errorMessage}
                   </p>
                 )}
@@ -189,17 +254,35 @@ export default function LoginForm() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full rounded-md bg-green-500 py-3 font-bold text-white transition hover:bg-green-600 disabled:cursor-not-allowed disabled:opacity-70"
+                  className="w-full rounded-xl bg-emerald-500 py-3 font-black text-white shadow-lg shadow-emerald-950/10 transition hover:bg-emerald-600 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70"
                 >
-                  {loading ? "Signing in..." : "Sign In"}
+                  {loading
+                    ? "Signing in..."
+                    : loginMode === "admin"
+                      ? "Sign In as Admin"
+                      : "Sign In as User"}
                 </button>
               </form>
 
-              <p className="mt-7 text-center text-sm text-gray-700">
-                Don&apos;t have an account?{" "}
-                <Link href="/register" className="font-bold text-green-700">
-                  Sign Up
-                </Link>
+              <p className="mt-7 text-center text-sm font-medium text-slate-600">
+                {mode === "admin" ? (
+                  <>
+                    Customer account?{" "}
+                    <Link href="/login" className="font-black text-emerald-700">
+                      Login as User
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    Don&apos;t have an account?{" "}
+                    <Link
+                      href="/register"
+                      className="font-black text-emerald-700"
+                    >
+                      Sign Up
+                    </Link>
+                  </>
+                )}
               </p>
             </div>
           </div>

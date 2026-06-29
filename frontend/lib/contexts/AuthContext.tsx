@@ -13,7 +13,6 @@ import { FreshCartUser, whoAmIApi } from "../api/auth";
 import {
   clearStoredAuth,
   getAuthToken,
-  getStoredUser,
   setAuthToken,
   setStoredUser,
 } from "../auth-storage";
@@ -31,9 +30,7 @@ type AuthContextValue = {
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUserState] = useState<FreshCartUser | null>(() =>
-    getStoredUser(),
-  );
+  const [user, setUserState] = useState<FreshCartUser | null>(null);
   const [loading, setLoading] = useState(true);
 
   const setUser = useCallback((nextUser: FreshCartUser) => {
