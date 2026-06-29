@@ -4,4 +4,5 @@ export const API_ENDPOINTS = {
   WHOAMI: "/api/v1/auth/whoami",
   UPDATE_PROFILE: "/api/v1/auth/update",
   UPDATE_PASSWORD: "/api/v1/auth/update-password",
+  ADMIN_USERS: "/api/v1/admin/users",
 };

@@ -1,16 +1,16 @@
-node_modules
+node_modules/
 .env
 .env.local
 
-.next
-dist
-build
+.next/
+dist/
+build/
 
-frontend/node_modules
-frontend/.next
+frontend/node_modules/
+frontend/.next/
 frontend/.env.local
 
-backend/node_modules
+backend/node_modules/
 backend/.env
-backend/public/profiles
-backend/uploads/profile
+backend/public/profiles/
+backend/uploads/profile/

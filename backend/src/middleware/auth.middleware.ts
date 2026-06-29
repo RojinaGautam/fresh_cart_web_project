@@ -87,3 +87,19 @@ export const authenticateUser = async (
     return ApiResponseHelper.error(res, "Internal server error", 500);
   }
 };
+
+export const requireAdmin = (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction,
+) => {
+  if (!req.user) {
+    return ApiResponseHelper.error(res, "Unauthorized", 401);
+  }
+
+  if (req.user.role !== "admin") {
+    return ApiResponseHelper.error(res, "Admin access required", 403);
+  }
+
+  next();
+};
