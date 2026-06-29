@@ -32,6 +32,7 @@ export default function AdminUsersPage() {
   });
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -51,7 +52,7 @@ export default function AdminUsersPage() {
 
       const response = await getAdminUsersApi({
         page,
-        limit: meta.limit,
+        limit,
         search,
       });
 
@@ -62,7 +63,7 @@ export default function AdminUsersPage() {
     } finally {
       setLoading(false);
     }
-  }, [meta.limit, page, search]);
+  }, [limit, page, search]);
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
@@ -182,15 +183,20 @@ export default function AdminUsersPage() {
     return `${start}-${end} of ${meta.total} users`;
   }, [meta]);
 
+  const handleLimitChange = (nextLimit: number) => {
+    setLimit(nextLimit);
+    setPage(1);
+  };
+
   return (
     <section className="space-y-6">
       <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-600">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-600">
               Admin Dashboard
             </p>
-            <h1 className="mt-1 text-2xl font-black text-slate-950">
+            <h1 className="mt-1 text-2xl font-semibold text-slate-950">
               User Management
             </h1>
             <p className="mt-1 text-sm font-medium text-slate-500">
@@ -210,14 +216,14 @@ export default function AdminUsersPage() {
                   setSearch(event.target.value);
                   setPage(1);
                 }}
-                placeholder="Search by ID, name, or email..."
+                placeholder="Search by name or email..."
                 className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-10 text-sm font-semibold outline-none transition focus:border-emerald-400 focus:bg-white focus:ring-4 focus:ring-emerald-100"
               />
             </div>
             <button
               type="button"
               onClick={openCreateModal}
-              className="flex h-11 items-center justify-center gap-2 rounded-xl bg-emerald-500 px-4 text-sm font-black text-white shadow-lg shadow-emerald-950/10 transition hover:bg-emerald-600 active:scale-[0.98]"
+              className="flex h-11 items-center justify-center gap-2 rounded-xl bg-emerald-500 px-4 text-sm font-semibold text-white shadow-lg shadow-emerald-950/10 transition hover:bg-emerald-600 active:scale-[0.98]"
             >
               <FiPlus size={16} />
               Create User
@@ -228,22 +234,22 @@ export default function AdminUsersPage() {
 
       <div className="grid gap-4 sm:grid-cols-3">
         <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          <p className="text-xs font-black uppercase text-slate-500">
+          <p className="text-xs font-semibold uppercase text-slate-500">
             Total Users
           </p>
-          <p className="mt-2 text-3xl font-black text-slate-950">{meta.total}</p>
+          <p className="mt-2 text-3xl font-semibold text-slate-950">{meta.total}</p>
         </div>
         <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          <p className="text-xs font-black uppercase text-slate-500">
+          <p className="text-xs font-semibold uppercase text-slate-500">
             Current Page
           </p>
-          <p className="mt-2 text-3xl font-black text-slate-950">{meta.page}</p>
+          <p className="mt-2 text-3xl font-semibold text-slate-950">{meta.page}</p>
         </div>
         <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          <p className="text-xs font-black uppercase text-slate-500">
+          <p className="text-xs font-semibold uppercase text-slate-500">
             Admins Visible
           </p>
-          <p className="mt-2 text-3xl font-black text-slate-950">
+          <p className="mt-2 text-3xl font-semibold text-slate-950">
             {users.filter((user) => user.role === "admin").length}
           </p>
         </div>
@@ -265,8 +271,10 @@ export default function AdminUsersPage() {
       <UserTable
         users={users}
         meta={meta}
+        limit={limit}
         loading={loading}
         pageLabel={pageLabel}
+        onLimitChange={handleLimitChange}
         onView={handleView}
         onEdit={openEditModal}
         onDelete={setDeleteUser}

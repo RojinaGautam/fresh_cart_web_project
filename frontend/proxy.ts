@@ -5,9 +5,14 @@ export function proxy(request: NextRequest) {
   const token = request.cookies.get("auth_token")?.value;
   const isDashboardRoute = pathname.startsWith("/dashboard");
   const isAdminRoute = pathname.startsWith("/admin");
+  const isAdminLoginRoute = pathname === "/admin/login";
 
-  if (!token && (isDashboardRoute || isAdminRoute)) {
+  if (!token && isDashboardRoute) {
     return NextResponse.redirect(new URL("/login", request.url));
+  }
+
+  if (!token && isAdminRoute && !isAdminLoginRoute) {
+    return NextResponse.redirect(new URL("/admin/login", request.url));
   }
 
   return NextResponse.next();

@@ -3,16 +3,20 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { FiLock, FiMail, FiShield, FiUser } from "react-icons/fi";
 import { loginAction } from "../../../lib/actions/auth-action";
 import { useAuth } from "../../../lib/contexts/AuthContext";
 import { loginSchema } from "./schema";
 
-export default function LoginForm() {
+export default function LoginForm({
+  mode = "user",
+}: {
+  mode?: "user" | "admin";
+}) {
   const router = useRouter();
-  const { login } = useAuth();
-  const [loginMode, setLoginMode] = useState<"user" | "admin">("user");
+  const { login, logout, user } = useAuth();
+  const loginMode = mode;
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -21,6 +25,12 @@ export default function LoginForm() {
 
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (mode === "user" && user?.role === "admin") {
+      logout();
+    }
+  }, [logout, mode, user?.role]);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -68,6 +78,11 @@ export default function LoginForm() {
         return;
       }
 
+      if (loginMode === "user" && user.role === "admin") {
+        setErrorMessage("Please use the admin login page for this account.");
+        return;
+      }
+
       login(token, user);
 
       router.push(user.role === "admin" ? "/admin" : "/");
@@ -110,14 +125,16 @@ export default function LoginForm() {
             <div className="rounded-3xl border border-slate-200 bg-white px-8 py-10 shadow-xl md:px-10">
               <div className="mb-7 text-center">
                 <p className="text-xs font-black uppercase tracking-[0.2em] text-emerald-600">
-                  FreshCart Access
+                  {mode === "admin" ? "FreshCart Admin" : "FreshCart Access"}
                 </p>
                 <h2 className="mt-2 text-3xl font-black text-slate-950">
                   Welcome Back
                 </h2>
 
                 <p className="mt-2 text-sm font-medium text-slate-500">
-                  Choose your account type to continue
+                  {mode === "admin"
+                    ? "Sign in with an administrator account"
+                    : "Sign in with your customer account"}
                 </p>
               </div>
 
@@ -125,7 +142,12 @@ export default function LoginForm() {
                 <div className="grid grid-cols-2 gap-2 rounded-2xl bg-slate-100 p-1">
                   <button
                     type="button"
-                    onClick={() => setLoginMode("user")}
+                    onClick={() => {
+                      if (mode === "admin") {
+                        router.push("/login");
+                        return;
+                      }
+                    }}
                     className={`flex min-h-11 items-center justify-center gap-2 rounded-xl px-3 py-2 text-sm font-black transition active:scale-[0.98] ${
                       loginMode === "user"
                         ? "bg-emerald-500 text-white shadow-sm"
@@ -137,7 +159,12 @@ export default function LoginForm() {
                   </button>
                   <button
                     type="button"
-                    onClick={() => setLoginMode("admin")}
+                    onClick={() => {
+                      if (mode === "user") {
+                        router.push("/admin/login");
+                        return;
+                      }
+                    }}
                     className={`flex min-h-11 items-center justify-center gap-2 rounded-xl px-3 py-2 text-sm font-black transition active:scale-[0.98] ${
                       loginMode === "admin"
                         ? "bg-slate-950 text-white shadow-sm"
@@ -238,10 +265,24 @@ export default function LoginForm() {
               </form>
 
               <p className="mt-7 text-center text-sm font-medium text-slate-600">
-                Don&apos;t have an account?{" "}
-                <Link href="/register" className="font-black text-emerald-700">
-                  Sign Up
-                </Link>
+                {mode === "admin" ? (
+                  <>
+                    Customer account?{" "}
+                    <Link href="/login" className="font-black text-emerald-700">
+                      Login as User
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    Don&apos;t have an account?{" "}
+                    <Link
+                      href="/register"
+                      className="font-black text-emerald-700"
+                    >
+                      Sign Up
+                    </Link>
+                  </>
+                )}
               </p>
             </div>
           </div>
