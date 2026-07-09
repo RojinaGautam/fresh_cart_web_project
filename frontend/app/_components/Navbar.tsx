@@ -1,12 +1,16 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useState } from "react";
 import {
   FiHeart,
   FiMapPin,
+  FiMenu,
   FiSearch,
   FiShoppingCart,
   FiUser,
+  FiX,
 } from "react-icons/fi";
 import { FreshCartUser } from "../../lib/api/auth";
 import Logo from "./Logo";
@@ -14,10 +18,10 @@ import Logo from "./Logo";
 const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
 const navItems = [
+  { href: "/about", label: "About" },
   { href: "/dashboard", label: "Shop" },
-  { href: "/dashboard", label: "Deals" },
-  { href: "/dashboard", label: "About" },
-  { href: "/dashboard", label: "Support" },
+  { href: "/deals", label: "Deals" },
+  { href: "/support", label: "Support" },
 ];
 
 export const getProfileImageUrl = (profileImage?: string | null) => {
@@ -61,8 +65,14 @@ export default function Navbar({
   user?: FreshCartUser | null;
   variant: "account" | "storefront";
 }) {
+  const pathname = usePathname();
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const isActive = (href: string) =>
+    href === "/" ? pathname === "/" : pathname.startsWith(href);
+
   return (
-    <header className="border-b border-gray-100 bg-white">
+    <header className="sticky top-0 z-40 border-b border-[#dfe7dc] bg-[#f7faf4]/95 backdrop-blur">
       <div
         className={`mx-auto flex min-h-16 w-full flex-wrap items-center justify-between gap-3 px-5 py-3 md:px-8 ${
           variant === "storefront" ? "max-w-[1500px]" : "max-w-6xl"
@@ -70,23 +80,24 @@ export default function Navbar({
       >
         <Logo />
 
-        {variant === "storefront" && (
-          <div className="hidden items-center gap-2 rounded-full bg-gray-100 px-3 py-2 text-[11px] font-bold text-gray-600 lg:flex">
-            <FiMapPin className="text-green-700" size={13} />
-            Deliver to New York, 10001
-          </div>
-        )}
-
-        <nav className="hidden items-center gap-6 text-xs font-medium text-[#26332b] md:flex">
+        <nav className="hidden items-center gap-1 rounded-full bg-[#e9efe6] p-1 text-xs font-semibold text-[#26332b] md:flex">
           {navItems.map((item) => (
-            <Link key={item.label} href={item.href} className="hover:text-green-700">
+            <Link
+              key={item.label}
+              href={item.href}
+              className={`rounded-full px-4 py-2 transition ${
+                isActive(item.href)
+                  ? "bg-white text-green-800 shadow-sm"
+                  : "hover:bg-white hover:text-green-800"
+              }`}
+            >
               {item.label}
             </Link>
           ))}
         </nav>
 
         {variant === "storefront" && (
-          <div className="order-last flex w-full items-center rounded-full bg-gray-100 px-3 py-2 text-gray-500 md:order-none md:max-w-[220px]">
+          <div className="order-last flex w-full items-center rounded-full bg-[#e9efe6] px-3 py-2 text-gray-600 md:order-none md:max-w-[220px]">
             <FiSearch size={14} />
             <input
               placeholder="Search fresh produce..."
@@ -96,26 +107,32 @@ export default function Navbar({
         )}
 
         <div className="flex items-center gap-3">
-          <button
-            type="button"
+          {variant === "storefront" && (
+            <div className="hidden items-center gap-2 rounded-full bg-[#e9efe6] px-3 py-2 text-[11px] font-semibold text-[#455846] lg:flex">
+              <FiMapPin className="text-green-800" size={13} />
+              Deliver to New York, 10001
+            </div>
+          )}
+          <Link
+            href="/wishlist"
             aria-label="Saved products"
-            className="hidden h-8 w-8 items-center justify-center rounded-full text-gray-600 hover:bg-green-50 hover:text-green-700 sm:flex"
+            className="hidden h-8 w-8 items-center justify-center rounded-full text-gray-700 hover:bg-[#dfeadb] hover:text-green-800 sm:flex"
           >
             <FiHeart size={15} />
-          </button>
-          <button
-            type="button"
+          </Link>
+          <Link
+            href="/cart"
             aria-label="Cart"
-            className="hidden h-8 w-8 items-center justify-center rounded-full text-gray-600 hover:bg-green-50 hover:text-green-700 sm:flex"
+            className="hidden h-8 w-8 items-center justify-center rounded-full text-gray-700 hover:bg-[#dfeadb] hover:text-green-800 sm:flex"
           >
             <FiShoppingCart size={15} />
-          </button>
+          </Link>
           {user && (
             <Link
               href="/dashboard/profile"
               aria-label="Go to profile"
               title="Profile"
-              className={`flex items-center gap-2 rounded-full border border-green-100 bg-green-50 text-xs font-bold text-green-700 transition hover:bg-green-100 ${
+            className={`flex items-center gap-2 rounded-full border border-green-200 bg-[#dfeadb] text-xs font-bold text-green-800 transition hover:bg-[#d3e2cf] ${
                 variant === "storefront"
                   ? "h-8 w-8 justify-center p-0"
                   : "px-2.5 py-1"
@@ -132,14 +149,99 @@ export default function Navbar({
             </Link>
           )}
           {variant === "storefront" && !user && (
-            <Link
-              href="/login"
-              className="rounded-md bg-[#079b3b] px-4 py-2 text-xs font-bold text-white transition hover:bg-[#087f35]"
-            >
-              Login
-            </Link>
+            <div className="hidden items-center gap-2 sm:flex">
+              <Link
+                href="/register"
+                className="rounded-md px-3 py-2 text-xs font-bold text-green-800 transition hover:bg-[#dfeadb]"
+              >
+                Sign up
+              </Link>
+              <Link
+                href="/login"
+                className="rounded-md bg-[#08743a] px-4 py-2 text-xs font-bold text-white transition hover:bg-[#075f31]"
+              >
+                Login
+              </Link>
+            </div>
           )}
+          <button
+            type="button"
+            aria-label="Open menu"
+            onClick={() => setMenuOpen((value) => !value)}
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-[#dfe7dc] text-gray-700 transition hover:bg-[#dfeadb] hover:text-green-800 md:hidden"
+          >
+            {menuOpen ? <FiX size={18} /> : <FiMenu size={18} />}
+          </button>
         </div>
+
+        {menuOpen && (
+          <div className="w-full rounded-2xl border border-[#dfe7dc] bg-white p-3 shadow-lg md:hidden">
+            <nav className="grid gap-1 text-sm font-semibold text-slate-700">
+              {variant === "storefront" && (
+                <div className="mb-1 flex items-center gap-2 rounded-xl bg-[#e9efe6] px-3 py-2 text-xs text-[#455846]">
+                  <FiMapPin className="text-green-800" size={14} />
+                  Deliver to New York, 10001
+                </div>
+              )}
+              {navItems.map((item) => (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  onClick={() => setMenuOpen(false)}
+                  className={`rounded-xl px-3 py-2 transition ${
+                    isActive(item.href)
+                      ? "bg-green-50 text-green-700"
+                      : "hover:bg-slate-50"
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              ))}
+              {user ? (
+                <>
+                  <Link
+                    href="/dashboard"
+                    onClick={() => setMenuOpen(false)}
+                    className="rounded-xl px-3 py-2 transition hover:bg-slate-50"
+                  >
+                    User Dashboard
+                  </Link>
+                  <Link
+                    href="/wishlist"
+                    onClick={() => setMenuOpen(false)}
+                    className="rounded-xl px-3 py-2 transition hover:bg-slate-50"
+                  >
+                    Saved Items
+                  </Link>
+                  <Link
+                    href="/dashboard/profile"
+                    onClick={() => setMenuOpen(false)}
+                    className="rounded-xl px-3 py-2 transition hover:bg-slate-50"
+                  >
+                    Profile
+                  </Link>
+                </>
+              ) : (
+                <div className="mt-2 grid grid-cols-2 gap-2">
+                  <Link
+                    href="/login"
+                    onClick={() => setMenuOpen(false)}
+                    className="rounded-xl bg-green-600 px-3 py-2 text-center text-white"
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    href="/register"
+                    onClick={() => setMenuOpen(false)}
+                    className="rounded-xl border border-green-100 px-3 py-2 text-center text-green-700"
+                  >
+                    Sign up
+                  </Link>
+                </div>
+              )}
+            </nav>
+          </div>
+        )}
       </div>
     </header>
   );
