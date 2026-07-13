@@ -2,9 +2,13 @@ import { UserService } from "../services/user.service";
 import { z } from "zod";
 import {
   CreateUserDTO,
+  ForgotPasswordDTO,
   LoginUserDTO,
+  ResendVerificationDTO,
+  ResetPasswordDTO,
   UpdatePasswordDTO,
   UpdateProfileDTO,
+  VerifyEmailDTO,
 } from "../dtos/user.dto";
 import { Request, Response } from "express";
 import { ApiResponseHelper } from "../uttils/apihelper.util";
@@ -60,6 +64,102 @@ export class UserController {
         { user, token },
         "Login successful",
       );
+    } catch (error: Error | any | unknown) {
+      return ApiResponseHelper.error(
+        res,
+        error.message || "Internal Server Error",
+        error.status || 500,
+      );
+    }
+  }
+
+  async verifyEmail(req: Request, res: Response) {
+    try {
+      const parsedData = VerifyEmailDTO.safeParse(req.body);
+
+      if (!parsedData.success) {
+        return ApiResponseHelper.error(
+          res,
+          z.prettifyError(parsedData.error),
+          400,
+        );
+      }
+
+      const user = await userService.verifyEmail(parsedData.data);
+
+      return ApiResponseHelper.success(res, user, "Email verified successfully");
+    } catch (error: Error | any | unknown) {
+      return ApiResponseHelper.error(
+        res,
+        error.message || "Internal Server Error",
+        error.status || 500,
+      );
+    }
+  }
+
+  async resendVerification(req: Request, res: Response) {
+    try {
+      const parsedData = ResendVerificationDTO.safeParse(req.body);
+
+      if (!parsedData.success) {
+        return ApiResponseHelper.error(
+          res,
+          z.prettifyError(parsedData.error),
+          400,
+        );
+      }
+
+      const result = await userService.resendVerification(parsedData.data);
+
+      return ApiResponseHelper.success(res, result, result.message);
+    } catch (error: Error | any | unknown) {
+      return ApiResponseHelper.error(
+        res,
+        error.message || "Internal Server Error",
+        error.status || 500,
+      );
+    }
+  }
+
+  async forgotPassword(req: Request, res: Response) {
+    try {
+      const parsedData = ForgotPasswordDTO.safeParse(req.body);
+
+      if (!parsedData.success) {
+        return ApiResponseHelper.error(
+          res,
+          z.prettifyError(parsedData.error),
+          400,
+        );
+      }
+
+      const result = await userService.forgotPassword(parsedData.data);
+
+      return ApiResponseHelper.success(res, result, result.message);
+    } catch (error: Error | any | unknown) {
+      return ApiResponseHelper.error(
+        res,
+        error.message || "Internal Server Error",
+        error.status || 500,
+      );
+    }
+  }
+
+  async resetPassword(req: Request, res: Response) {
+    try {
+      const parsedData = ResetPasswordDTO.safeParse(req.body);
+
+      if (!parsedData.success) {
+        return ApiResponseHelper.error(
+          res,
+          z.prettifyError(parsedData.error),
+          400,
+        );
+      }
+
+      const result = await userService.resetPassword(parsedData.data);
+
+      return ApiResponseHelper.success(res, result, result.message);
     } catch (error: Error | any | unknown) {
       return ApiResponseHelper.error(
         res,

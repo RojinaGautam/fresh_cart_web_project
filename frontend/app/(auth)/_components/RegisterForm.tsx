@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
+import { FiLock, FiMail, FiPhone, FiUser } from "react-icons/fi";
 import { registerAction } from "../../../lib/actions/auth-action";
 import { registerSchema } from "./schema";
 
@@ -54,7 +55,11 @@ export default function RegisterForm() {
         return;
       }
 
-      setSuccessMessage("Registration successful! Please login now.");
+      setSuccessMessage(
+        "Registration successful! Check your email for a verification code.",
+      );
+
+      const registeredEmail = email;
 
       setFullName("");
       setEmail("");
@@ -63,8 +68,8 @@ export default function RegisterForm() {
       setConfirmPassword("");
 
       setTimeout(() => {
-        router.push("/login");
-      }, 2500);
+        router.push(`/verify-email?email=${encodeURIComponent(registeredEmail)}`);
+      }, 1500);
     } catch {
       setErrorMessage("Something went wrong. Please try again.");
     } finally {
@@ -73,13 +78,22 @@ export default function RegisterForm() {
   };
 
   return (
-    <main className="h-[100dvh] bg-white">
-      <section className="mx-auto flex h-full overflow-hidden bg-white">
-        {/* LEFT FORM SIDE */}
-        <div className="flex w-full items-center justify-center px-6 py-8 lg:w-[52%] lg:px-10">
-          <div className="w-full max-w-[520px]">
-            {/* LOGO */}
-            <div className="mb-6 flex justify-center">
+    <main className="min-h-[100dvh] bg-slate-100">
+      <section className="mx-auto flex min-h-[100dvh] overflow-hidden bg-white">
+        <div className="relative hidden min-h-[100dvh] w-[52%] lg:block">
+          <Image
+            src="/register.png"
+            alt="Fresh groceries"
+            fill
+            priority
+            className="rounded-r-[70px] object-cover"
+          />
+          <div className="absolute inset-0 rounded-r-[70px] bg-gradient-to-r from-emerald-950/20 to-transparent" />
+        </div>
+
+        <div className="flex w-full items-center justify-center px-6 py-8 lg:w-[48%] lg:px-10">
+          <div className="w-full max-w-[500px]">
+            <div className="mb-8 flex justify-center">
               <Image
                 src="/logo.png"
                 alt="FreshCart Logo"
@@ -90,103 +104,125 @@ export default function RegisterForm() {
               />
             </div>
 
-            <div className="rounded-[36px] bg-[#c3d2c3] px-8 py-8 shadow-md md:px-10">
-              <div className="mb-6 text-center">
-                <h2 className="text-3xl font-bold text-black">
+            <div className="rounded-3xl border border-slate-200 bg-white px-8 py-10 shadow-xl md:px-10">
+              <div className="mb-7 text-center">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-600">
+                  FreshCart Access
+                </p>
+                <h2 className="mt-2 text-3xl font-semibold text-slate-950">
                   Create Account
                 </h2>
-
-                <p className="mt-2 text-sm text-gray-600">
-                  Sign up to start fresh shopping today
+                <p className="mt-2 text-sm font-medium text-slate-500">
+                  Join FreshCart for faster checkout and fresher weekly picks
                 </p>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-4">
-                {/* Full Name */}
+              <form onSubmit={handleSubmit} className="space-y-5">
                 <div>
-                  <label className="mb-2 block text-sm font-bold text-[#10263a]">
+                  <label className="mb-2 block text-sm font-semibold text-slate-800">
                     Full Name
                   </label>
-
-                  <input
-                    type="text"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    placeholder="Enter your full name"
-                    className="w-full rounded-md border border-gray-200 bg-white px-4 py-3 text-sm text-black outline-none focus:ring-2 focus:ring-green-500"
-                  />
+                  <div className="relative">
+                    <FiUser
+                      size={18}
+                      className="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-600"
+                    />
+                    <input
+                      type="text"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      placeholder="Enter your full name"
+                      className="w-full rounded-xl border border-slate-200 bg-slate-50 px-10 py-3 text-sm font-semibold text-slate-950 outline-none transition focus:border-emerald-400 focus:bg-white focus:ring-4 focus:ring-emerald-100"
+                    />
+                  </div>
                 </div>
 
-                {/* Email */}
                 <div>
-                  <label className="mb-2 block text-sm font-bold text-[#10263a]">
+                  <label className="mb-2 block text-sm font-semibold text-slate-800">
                     Email Address
                   </label>
-
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="name@example.com"
-                    className="w-full rounded-md border border-gray-200 bg-white px-4 py-3 text-sm text-black outline-none focus:ring-2 focus:ring-green-500"
-                  />
+                  <div className="relative">
+                    <FiMail
+                      size={18}
+                      className="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-600"
+                    />
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="name@example.com"
+                      className="w-full rounded-xl border border-slate-200 bg-slate-50 px-10 py-3 text-sm font-semibold text-slate-950 outline-none transition focus:border-emerald-400 focus:bg-white focus:ring-4 focus:ring-emerald-100"
+                    />
+                  </div>
                 </div>
 
-                {/* Phone Number */}
                 <div>
-                  <label className="mb-2 block text-sm font-bold text-[#10263a]">
+                  <label className="mb-2 block text-sm font-semibold text-slate-800">
                     Phone Number
                   </label>
-
-                  <input
-                    type="tel"
-                    value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
-                    placeholder="9800000000"
-                    className="w-full rounded-md border border-gray-200 bg-white px-4 py-3 text-sm text-black outline-none focus:ring-2 focus:ring-green-500"
-                  />
+                  <div className="relative">
+                    <FiPhone
+                      size={18}
+                      className="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-600"
+                    />
+                    <input
+                      type="tel"
+                      value={phoneNumber}
+                      onChange={(e) => setPhoneNumber(e.target.value)}
+                      placeholder="9800000000"
+                      className="w-full rounded-xl border border-slate-200 bg-slate-50 px-10 py-3 text-sm font-semibold text-slate-950 outline-none transition focus:border-emerald-400 focus:bg-white focus:ring-4 focus:ring-emerald-100"
+                    />
+                  </div>
                 </div>
 
-                {/* Password */}
-                <div>
-                  <label className="mb-2 block text-sm font-bold text-[#10263a]">
-                    Password
-                  </label>
+                <div className="grid gap-5 sm:grid-cols-2">
+                  <div>
+                    <label className="mb-2 block text-sm font-semibold text-slate-800">
+                      Password
+                    </label>
+                    <div className="relative">
+                      <FiLock
+                        size={18}
+                        className="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-600"
+                      />
+                      <input
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="********"
+                        className="w-full rounded-xl border border-slate-200 bg-slate-50 px-10 py-3 text-sm font-semibold text-slate-950 outline-none transition focus:border-emerald-400 focus:bg-white focus:ring-4 focus:ring-emerald-100"
+                      />
+                    </div>
+                  </div>
 
-                  <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="********"
-                    className="w-full rounded-md border border-gray-200 bg-white px-4 py-3 text-sm text-black outline-none focus:ring-2 focus:ring-green-500"
-                  />
+                  <div>
+                    <label className="mb-2 block text-sm font-semibold text-slate-800">
+                      Confirm Password
+                    </label>
+                    <div className="relative">
+                      <FiLock
+                        size={18}
+                        className="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-600"
+                      />
+                      <input
+                        type="password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        placeholder="********"
+                        className="w-full rounded-xl border border-slate-200 bg-slate-50 px-10 py-3 text-sm font-semibold text-slate-950 outline-none transition focus:border-emerald-400 focus:bg-white focus:ring-4 focus:ring-emerald-100"
+                      />
+                    </div>
+                  </div>
                 </div>
 
-                {/* Confirm Password */}
-                <div>
-                  <label className="mb-2 block text-sm font-bold text-[#10263a]">
-                    Confirm Password
-                  </label>
-
-                  <input
-                    type="password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="********"
-                    className="w-full rounded-md border border-gray-200 bg-white px-4 py-3 text-sm text-black outline-none focus:ring-2 focus:ring-green-500"
-                  />
-                </div>
-
-                {/* Error Message */}
                 {errorMessage && (
-                  <p className="rounded-md bg-red-100 px-3 py-2 text-center text-sm font-medium text-red-700">
+                  <p className="rounded-xl border border-red-100 bg-red-50 px-3 py-2 text-center text-sm font-semibold text-red-700">
                     {errorMessage}
                   </p>
                 )}
 
-                {/* Success Message */}
                 {successMessage && (
-                  <p className="rounded-md bg-green-100 px-3 py-2 text-center text-sm font-medium text-green-700">
+                  <p className="rounded-xl border border-emerald-100 bg-emerald-50 px-3 py-2 text-center text-sm font-semibold text-emerald-700">
                     {successMessage}
                   </p>
                 )}
@@ -194,31 +230,20 @@ export default function RegisterForm() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full rounded-md bg-green-500 py-3 font-bold text-white transition hover:bg-green-600 disabled:cursor-not-allowed disabled:opacity-70"
+                  className="w-full rounded-xl bg-emerald-500 py-3 font-semibold text-white shadow-lg shadow-emerald-950/10 transition hover:bg-emerald-600 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70"
                 >
-                  {loading ? "Creating account..." : "Sign up"}
+                  {loading ? "Creating account..." : "Create Account"}
                 </button>
               </form>
 
-              <p className="mt-6 text-center text-sm text-gray-700">
+              <p className="mt-7 text-center text-sm font-medium text-slate-600">
                 Already have an account?{" "}
-                <Link href="/login" className="font-bold text-green-700">
+                <Link href="/login" className="font-semibold text-emerald-700">
                   Sign In
                 </Link>
               </p>
             </div>
           </div>
-        </div>
-
-        {/* RIGHT IMAGE SIDE */}
-        <div className="relative hidden h-full w-[48%] lg:block">
-          <Image
-            src="/register.png"
-            alt="Fresh vegetables"
-            fill
-            priority
-            className="rounded-l-[70px] object-cover"
-          />
         </div>
       </section>
     </main>

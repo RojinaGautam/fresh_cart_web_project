@@ -3,6 +3,11 @@ import { UserType } from "../types/user.type";
 
 export interface IUser extends UserType, Document {
   _id: mongoose.Types.ObjectId;
+  isVerified: boolean;
+  emailVerificationOtp?: string | null;
+  emailVerificationOtpExpires?: Date | null;
+  passwordResetOtp?: string | null;
+  passwordResetOtpExpires?: Date | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -43,6 +48,31 @@ const UserMongoSchema: Schema<IUser> = new Schema(
       type: String,
       enum: ["admin", "user"],
       default: "user",
+    },
+
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+
+    emailVerificationOtp: {
+      type: String,
+      default: null,
+    },
+
+    emailVerificationOtpExpires: {
+      type: Date,
+      default: null,
+    },
+
+    passwordResetOtp: {
+      type: String,
+      default: null,
+    },
+
+    passwordResetOtpExpires: {
+      type: Date,
+      default: null,
     },
   },
   {

@@ -20,6 +20,7 @@ export type FreshCartUser = {
   phoneNumber: string;
   profileImage?: string | null;
   role: string;
+  isVerified: boolean;
   createdAt?: string;
   updatedAt?: string;
 };
@@ -36,6 +37,41 @@ export const registerApi = async (payload: RegisterPayload) => {
 
 export const loginApi = async (payload: LoginPayload) => {
   const response = await axiosInstance.post(API_ENDPOINTS.LOGIN, payload);
+  return response.data;
+};
+
+export const verifyEmailApi = async (email: string, otp: string) => {
+  const response = await axiosInstance.post(API_ENDPOINTS.VERIFY_EMAIL, {
+    email,
+    otp,
+  });
+  return response.data;
+};
+
+export const resendVerificationApi = async (email: string) => {
+  const response = await axiosInstance.post(API_ENDPOINTS.RESEND_VERIFICATION, {
+    email,
+  });
+  return response.data;
+};
+
+export const forgotPasswordApi = async (email: string) => {
+  const response = await axiosInstance.post(API_ENDPOINTS.FORGOT_PASSWORD, {
+    email,
+  });
+  return response.data;
+};
+
+export const resetPasswordApi = async (
+  email: string,
+  otp: string,
+  newPassword: string,
+) => {
+  const response = await axiosInstance.post(API_ENDPOINTS.RESET_PASSWORD, {
+    email,
+    otp,
+    newPassword,
+  });
   return response.data;
 };
 

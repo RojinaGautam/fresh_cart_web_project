@@ -36,6 +36,7 @@ export class AdminUserService {
       phoneNumber: user.phoneNumber,
       profileImage: user.profileImage || null,
       role: user.role,
+      isVerified: user.isVerified,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     };
@@ -88,6 +89,8 @@ export class AdminUserService {
     const createdUser = await userRepository.createUser({
       ...userData,
       password: hashedPassword,
+      // Users created by an admin are trusted and skip email verification.
+      isVerified: true,
     });
 
     return this.toPublicUser(createdUser);
