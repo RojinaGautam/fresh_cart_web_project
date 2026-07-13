@@ -4,15 +4,30 @@ import { FiGlobe, FiShare2 } from "react-icons/fi";
 const footerGroups = [
   {
     title: "Shop",
-    links: ["All Products", "Organic Fruit", "Fresh Greens", "Local Dairy"],
+    links: [
+      { label: "All Products", href: "/dashboard" },
+      { label: "Organic Fruit", href: "/dashboard" },
+      { label: "Fresh Greens", href: "/dashboard" },
+      { label: "Local Dairy", href: "/dashboard" },
+    ],
   },
   {
     title: "Company",
-    links: ["Our Story", "Sustainability", "Farmer Partners", "Careers"],
+    links: [
+      { label: "Our Story", href: "/about" },
+      { label: "Sustainability", href: "/about" },
+      { label: "Farmer Partners", href: "/about" },
+      { label: "Careers", href: "/support" },
+    ],
   },
   {
     title: "Support",
-    links: ["Help Center", "Shipping Policy", "Returns", "Contact Us"],
+    links: [
+      { label: "Help Center", href: "/support" },
+      { label: "Shipping Policy", href: "/support" },
+      { label: "Returns", href: "/support" },
+      { label: "Contact Us", href: "/support" },
+    ],
   },
 ];
 
@@ -26,7 +41,7 @@ export default function Footer({ wide = false }: { wide?: boolean }) {
       >
         <div className="grid gap-8 text-xs text-gray-500 md:grid-cols-[1.5fr_repeat(3,1fr)]">
           <div>
-            <p className="text-sm font-extrabold text-[#16863d]">FreshCart</p>
+            <p className="text-sm font-semibold text-[#16863d]">FreshCart</p>
             <p className="mt-3 max-w-xs leading-5">
               Direct from local farms to your kitchen. We believe in
               transparency, sustainability, and the power of fresh ingredients.
@@ -41,13 +56,13 @@ export default function Footer({ wide = false }: { wide?: boolean }) {
             <div key={group.title}>
               <p className="font-bold text-[#26332b]">{group.title}</p>
               <div className="mt-3 space-y-2">
-                {group.links.map((label) => (
+                {group.links.map((link) => (
                   <Link
-                    key={label}
-                    href="/dashboard"
+                    key={link.label}
+                    href={link.href}
                     className="block transition hover:text-green-700"
                   >
-                    {label}
+                    {link.label}
                   </Link>
                 ))}
               </div>

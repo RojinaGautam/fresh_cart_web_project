@@ -1,66 +1,12 @@
 "use client";
-
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import {
-  FiCreditCard,
   FiLogOut,
-  FiMapPin,
-  FiPackage,
-  FiUser,
 } from "react-icons/fi";
 import { useAuth } from "../../lib/contexts/AuthContext";
 import Footer from "./Footer";
 import Navbar, { Avatar, getProfileImageUrl } from "./Navbar";
 
-const accountItems = [
-  { href: "/dashboard/profile", label: "Personal Info", icon: FiUser },
-  { href: "/dashboard", label: "Order History", icon: FiPackage },
-  { href: "/dashboard", label: "Saved Addresses", icon: FiMapPin },
-  { href: "/dashboard/profile#payment-methods", label: "Payment Methods", icon: FiCreditCard },
-];
-
 export { Avatar, getProfileImageUrl };
-
-function AccountSidebar({ onLogout }: { onLogout: () => void }) {
-  const pathname = usePathname();
-
-  return (
-    <aside className="rounded-md border border-gray-100 bg-white p-3 shadow-sm">
-      <div className="space-y-1">
-        {accountItems.map((item) => {
-          const Icon = item.icon;
-          const active =
-            item.href === "/dashboard/profile" && pathname === item.href;
-
-          return (
-            <Link
-              key={item.label}
-              href={item.href}
-              className={`flex items-center gap-3 rounded px-3 py-2 text-xs font-bold transition ${
-                active
-                  ? "bg-green-600 text-white"
-                  : "text-gray-600 hover:bg-green-50 hover:text-green-700"
-              }`}
-            >
-              <Icon size={14} />
-              {item.label}
-            </Link>
-          );
-        })}
-      </div>
-
-      <button
-        type="button"
-        onClick={onLogout}
-        className="mt-8 flex w-full items-center gap-3 rounded px-3 py-2 text-xs font-bold text-red-500 hover:bg-red-50"
-      >
-        <FiLogOut size={14} />
-        Sign Out
-      </button>
-    </aside>
-  );
-}
 
 export default function AccountShell({
   children,
@@ -78,13 +24,22 @@ export default function AccountShell({
   };
 
   return (
-    <main className="min-h-screen bg-[#f5f6f4] text-[#182d1f]">
+    <main className="min-h-screen bg-[#eef2ea] text-[#182d1f]">
       <Navbar user={user} variant={variant} />
 
       {variant === "account" ? (
-        <section className="mx-auto grid w-full max-w-[1500px] gap-6 px-5 py-8 md:grid-cols-[220px_minmax(0,1fr)] md:px-8 lg:gap-8 lg:py-10">
-          <AccountSidebar onLogout={handleLogout} />
-          <div>{children}</div>
+        <section className="mx-auto w-full max-w-[1500px] px-5 py-8 md:px-8 lg:py-10">
+          {children}
+          <div className="mt-8 flex justify-center border-t border-[#d8e2d4] pt-6">
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="inline-flex items-center justify-center gap-2 rounded-full border border-red-100 bg-white px-5 py-3 text-sm font-semibold text-red-500 shadow-sm transition hover:bg-red-50"
+            >
+              <FiLogOut size={16} />
+              Sign Out
+            </button>
+          </div>
         </section>
       ) : (
         <section className="mx-auto w-full max-w-[1500px] px-5 py-5 md:px-8">

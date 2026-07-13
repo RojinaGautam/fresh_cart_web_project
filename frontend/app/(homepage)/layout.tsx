@@ -13,7 +13,7 @@ export default function HomepageLayout({
   const publicUser = user?.role === "admin" ? null : user;
 
   return (
-    <main className="min-h-screen bg-[#f5f6f4] text-[#182d1f]">
+    <main className="min-h-screen bg-[#eef2ea] text-[#182d1f]">
       <Navbar user={publicUser} variant="storefront" />
       <section className="mx-auto w-full max-w-[1500px] px-5 py-5 md:px-8">
         {children}

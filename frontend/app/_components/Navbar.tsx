@@ -13,13 +13,15 @@ import {
   FiX,
 } from "react-icons/fi";
 import { FreshCartUser } from "../../lib/api/auth";
+import { useCart } from "../../lib/contexts/CartContext";
+import { useWishlist } from "../../lib/contexts/WishlistContext";
 import Logo from "./Logo";
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
 const navItems = [
   { href: "/about", label: "About" },
-  { href: "/dashboard", label: "Shop" },
+  { href: "/", label: "Shop" },
   { href: "/deals", label: "Deals" },
   { href: "/support", label: "Support" },
 ];
@@ -67,6 +69,11 @@ export default function Navbar({
 }) {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
+  const { cart } = useCart();
+  const { wishlist } = useWishlist();
+
+  const cartCount = cart?.items.reduce((sum, item) => sum + item.quantity, 0) || 0;
+  const wishlistCount = wishlist?.items.length || 0;
 
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href);
@@ -113,20 +120,34 @@ export default function Navbar({
               Deliver to New York, 10001
             </div>
           )}
-          <Link
-            href="/wishlist"
-            aria-label="Saved products"
-            className="hidden h-8 w-8 items-center justify-center rounded-full text-gray-700 hover:bg-[#dfeadb] hover:text-green-800 sm:flex"
-          >
-            <FiHeart size={15} />
-          </Link>
-          <Link
-            href="/cart"
-            aria-label="Cart"
-            className="hidden h-8 w-8 items-center justify-center rounded-full text-gray-700 hover:bg-[#dfeadb] hover:text-green-800 sm:flex"
-          >
-            <FiShoppingCart size={15} />
-          </Link>
+          {user && (
+            <Link
+              href="/wishlist"
+              aria-label="Saved products"
+              className="relative hidden h-8 w-8 items-center justify-center rounded-full text-gray-700 hover:bg-[#dfeadb] hover:text-green-800 sm:flex"
+            >
+              <FiHeart size={15} />
+              {wishlistCount > 0 && (
+                <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-500 px-1 text-[9px] font-bold text-white">
+                  {wishlistCount}
+                </span>
+              )}
+            </Link>
+          )}
+          {user && (
+            <Link
+              href="/cart"
+              aria-label="Cart"
+              className="relative hidden h-8 w-8 items-center justify-center rounded-full text-gray-700 hover:bg-[#dfeadb] hover:text-green-800 sm:flex"
+            >
+              <FiShoppingCart size={15} />
+              {cartCount > 0 && (
+                <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-green-700 px-1 text-[9px] font-bold text-white">
+                  {cartCount}
+                </span>
+              )}
+            </Link>
+          )}
           {user && (
             <Link
               href="/dashboard/profile"
@@ -207,11 +228,28 @@ export default function Navbar({
                     User Dashboard
                   </Link>
                   <Link
+                    href="/cart"
+                    onClick={() => setMenuOpen(false)}
+                    className="flex items-center justify-between rounded-xl px-3 py-2 transition hover:bg-slate-50"
+                  >
+                    Cart
+                    {cartCount > 0 && (
+                      <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-green-700 px-1.5 text-[10px] font-bold text-white">
+                        {cartCount}
+                      </span>
+                    )}
+                  </Link>
+                  <Link
                     href="/wishlist"
                     onClick={() => setMenuOpen(false)}
-                    className="rounded-xl px-3 py-2 transition hover:bg-slate-50"
+                    className="flex items-center justify-between rounded-xl px-3 py-2 transition hover:bg-slate-50"
                   >
                     Saved Items
+                    {wishlistCount > 0 && (
+                      <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-rose-500 px-1.5 text-[10px] font-bold text-white">
+                        {wishlistCount}
+                      </span>
+                    )}
                   </Link>
                   <Link
                     href="/dashboard/profile"
