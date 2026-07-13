@@ -19,6 +19,10 @@ const handleProfileUpload = (req: Request, res: Response, next: NextFunction) =>
 
 userRouter.post("/register", userController.createUser);
 userRouter.post("/login", userController.loginUser);
+userRouter.post("/verify-email", userController.verifyEmail);
+userRouter.post("/resend-verification", userController.resendVerification);
+userRouter.post("/forgot-password", userController.forgotPassword);
+userRouter.post("/reset-password", userController.resetPassword);
 userRouter.get("/whoami", authenticateUser, userController.whoAmI);
 userRouter.patch(
   "/update",

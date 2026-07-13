@@ -61,3 +61,34 @@ export const AdminUpdateUserDTO = AdminUserBaseDTO.partial().refine(
 );
 
 export type AdminUpdateUserDTO = z.infer<typeof AdminUpdateUserDTO>;
+
+// DTO for email verification (via OTP)
+export const VerifyEmailDTO = z.object({
+  email: z.string().email("Invalid email address"),
+  otp: z.string().length(6, "OTP must be 6 digits"),
+});
+
+export type VerifyEmailDTO = z.infer<typeof VerifyEmailDTO>;
+
+// DTO for resending the verification OTP
+export const ResendVerificationDTO = z.object({
+  email: z.string().email("Invalid email address"),
+});
+
+export type ResendVerificationDTO = z.infer<typeof ResendVerificationDTO>;
+
+// DTO for requesting a password reset OTP
+export const ForgotPasswordDTO = z.object({
+  email: z.string().email("Invalid email address"),
+});
+
+export type ForgotPasswordDTO = z.infer<typeof ForgotPasswordDTO>;
+
+// DTO for completing a password reset (via OTP)
+export const ResetPasswordDTO = z.object({
+  email: z.string().email("Invalid email address"),
+  otp: z.string().length(6, "OTP must be 6 digits"),
+  newPassword: z.string().min(6, "Password must be at least 6 characters"),
+});
+
+export type ResetPasswordDTO = z.infer<typeof ResetPasswordDTO>;
