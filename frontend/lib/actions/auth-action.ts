@@ -1,4 +1,16 @@
-import { loginApi, LoginPayload, registerApi, RegisterPayload, updateProfileApi, updatePasswordApi, UpdatePasswordPayload } from "../api/auth";
+import {
+  loginApi,
+  LoginPayload,
+  registerApi,
+  RegisterPayload,
+  updateProfileApi,
+  updatePasswordApi,
+  UpdatePasswordPayload,
+  verifyEmailApi,
+  resendVerificationApi,
+  forgotPasswordApi,
+  resetPasswordApi,
+} from "../api/auth";
 
 type ApiError = {
   response?: {
@@ -31,6 +43,62 @@ export const loginAction = async (payload: LoginPayload) => {
     return apiError.response?.data || {
       success: false,
       message: "Login failed",
+    };
+  }
+};
+
+export const verifyEmailAction = async (email: string, otp: string) => {
+  try {
+    const response = await verifyEmailApi(email, otp);
+    return response;
+  } catch (error) {
+    const apiError = error as ApiError;
+    return apiError.response?.data || {
+      success: false,
+      message: "Email verification failed",
+    };
+  }
+};
+
+export const resendVerificationAction = async (email: string) => {
+  try {
+    const response = await resendVerificationApi(email);
+    return response;
+  } catch (error) {
+    const apiError = error as ApiError;
+    return apiError.response?.data || {
+      success: false,
+      message: "Failed to resend verification email",
+    };
+  }
+};
+
+export const forgotPasswordAction = async (email: string) => {
+  try {
+    const response = await forgotPasswordApi(email);
+    return response;
+  } catch (error) {
+    const apiError = error as ApiError;
+    return apiError.response?.data || {
+      success: false,
+      message: "Failed to send password reset email",
+    };
+  }
+};
+
+export const resetPasswordAction = async (
+  email: string,
+  otp: string,
+  newPassword: string,
+) => {
+  try {
+    const response = await resetPasswordApi(email, otp, newPassword);
+    return response;
+  } catch (error) {
+    const apiError = error as ApiError;
+    return apiError.response?.data || {
+      success: false,
+      message: "Failed to reset password",
     };
   }
 };

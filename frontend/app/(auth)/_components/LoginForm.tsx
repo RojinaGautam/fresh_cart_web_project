@@ -5,17 +5,19 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 import { FiLock, FiMail, FiShield, FiUser } from "react-icons/fi";
-import { loginAction } from "../../../lib/actions/auth-action";
+import { loginAction, resendVerificationAction } from "../../../lib/actions/auth-action";
 import { useAuth } from "../../../lib/contexts/AuthContext";
 import { loginSchema } from "./schema";
 
 export default function LoginForm({
   mode = "user",
+  redirectPath,
 }: {
   mode?: "user" | "admin";
+  redirectPath?: string;
 }) {
   const router = useRouter();
-  const { login, logout, user } = useAuth();
+  const { login, user, loading: authLoading } = useAuth();
   const loginMode = mode;
 
   const [email, setEmail] = useState("");
@@ -25,17 +27,22 @@ export default function LoginForm({
 
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showResend, setShowResend] = useState(false);
+  const [resendStatus, setResendStatus] = useState("");
+  const [resending, setResending] = useState(false);
 
   useEffect(() => {
-    if (mode === "user" && user?.role === "admin") {
-      logout();
-    }
-  }, [logout, mode, user?.role]);
+    if (authLoading || !user) return;
+
+    router.replace(user.role === "admin" ? "/admin" : redirectPath || "/");
+  }, [authLoading, user, redirectPath, router]);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     setErrorMessage("");
+    setShowResend(false);
+    setResendStatus("");
 
     const validatedData = loginSchema.safeParse({
       email,
@@ -57,6 +64,7 @@ export default function LoginForm({
 
       if (!response.success) {
         setErrorMessage(response.message || "Login failed");
+        setShowResend(/verify/i.test(response.message || ""));
         return;
       }
 
@@ -85,12 +93,26 @@ export default function LoginForm({
 
       login(token, user);
 
-      router.push(user.role === "admin" ? "/admin" : "/");
+      router.push(user.role === "admin" ? "/admin" : redirectPath || "/");
     } catch {
       setErrorMessage("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleResendVerification = async () => {
+    setResending(true);
+    setResendStatus("");
+
+    const response = await resendVerificationAction(email);
+
+    setResending(false);
+    setResendStatus(
+      response.success
+        ? response.message || "Verification email sent."
+        : response.message || "Unable to resend verification email.",
+    );
   };
 
   return (
@@ -206,7 +228,7 @@ export default function LoginForm({
                     </label>
 
                     <Link
-                      href="#"
+                      href="/forgot-password"
                       className="text-xs font-bold text-emerald-700 hover:underline"
                     >
                       Forgot password?
@@ -246,8 +268,32 @@ export default function LoginForm({
 
                 {/* Error Message */}
                 {errorMessage && (
-                  <p className="rounded-xl border border-red-100 bg-red-50 px-3 py-2 text-center text-sm font-semibold text-red-700">
-                    {errorMessage}
+                  <div className="rounded-xl border border-red-100 bg-red-50 px-3 py-2 text-center text-sm font-semibold text-red-700">
+                    <p>{errorMessage}</p>
+                    {showResend && (
+                      <div className="mt-2 flex items-center justify-center gap-3">
+                        <button
+                          type="button"
+                          onClick={handleResendVerification}
+                          disabled={resending}
+                          className="text-xs font-bold text-emerald-700 underline disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                          {resending ? "Sending..." : "Resend code"}
+                        </button>
+                        <Link
+                          href={`/verify-email?email=${encodeURIComponent(email)}`}
+                          className="text-xs font-bold text-emerald-700 underline"
+                        >
+                          Enter code
+                        </Link>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {resendStatus && (
+                  <p className="rounded-xl border border-emerald-100 bg-emerald-50 px-3 py-2 text-center text-sm font-semibold text-emerald-700">
+                    {resendStatus}
                   </p>
                 )}
 
