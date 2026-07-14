@@ -31,7 +31,9 @@ export class UserMongoRepository implements IUserRepository {
   }
 
   async getUserByEmail(email: string): Promise<IUser | null> {
-    const found = await UserModel.findOne({ email });
+    const found = await UserModel.findOne({
+      email: email.trim().toLowerCase(),
+    });
     return found;
   }
 
