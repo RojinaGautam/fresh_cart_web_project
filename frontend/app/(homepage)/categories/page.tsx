@@ -3,7 +3,12 @@ import CategoryBrowsePage from "./_components/CategoryBrowsePage";
 import { getCategoriesAction } from "@/lib/actions/categories-action";
 import { Category } from "@/lib/api/categories";
 
-export default async function CategoriesPage() {
+export default async function CategoriesPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ search?: string }>;
+}) {
+  const resolvedSearchParams = await searchParams;
   const categoriesResponse = await getCategoriesAction();
   const categories = categoriesResponse.success
     ? (categoriesResponse.data as Category[])
@@ -13,7 +18,15 @@ export default async function CategoriesPage() {
     notFound();
   }
 
+  const initialSearch = resolvedSearchParams?.search || "";
+
   return (
-    <CategoryBrowsePage category={categories[0]} otherCategories={categories} />
+    <CategoryBrowsePage
+      key={`all-${initialSearch}`}
+      category={categories[0]}
+      otherCategories={categories}
+      initialSearch={initialSearch}
+      browseAllProducts
+    />
   );
 }
