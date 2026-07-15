@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { FormEvent } from "react";
 import { useState } from "react";
 import {
   FiHeart,
@@ -68,7 +69,9 @@ export default function Navbar({
   variant: "account" | "storefront";
 }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const { cart } = useCart();
   const { wishlist } = useWishlist();
 
@@ -77,6 +80,14 @@ export default function Navbar({
 
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href);
+
+  const handleSearchSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const query = searchTerm.trim();
+    router.push(query ? `/categories?search=${encodeURIComponent(query)}` : "/categories");
+    setMenuOpen(false);
+  };
 
   return (
     <header className="sticky top-0 z-40 border-b border-[#dfe7dc] bg-[#f7faf4]/95 backdrop-blur">
@@ -104,13 +115,18 @@ export default function Navbar({
         </nav>
 
         {variant === "storefront" && (
-          <div className="order-last flex w-full items-center rounded-full bg-[#e9efe6] px-3 py-2 text-gray-600 md:order-none md:max-w-[220px]">
+          <form
+            onSubmit={handleSearchSubmit}
+            className="order-last flex w-full items-center rounded-full bg-[#e9efe6] px-3 py-2 text-gray-600 md:order-none md:max-w-[220px]"
+          >
             <FiSearch size={14} />
             <input
+              value={searchTerm}
+              onChange={(event) => setSearchTerm(event.target.value)}
               placeholder="Search fresh produce..."
               className="ml-2 w-full bg-transparent text-xs font-medium outline-none placeholder:text-gray-400"
             />
-          </div>
+          </form>
         )}
 
         <div className="flex items-center gap-3">
