@@ -10,7 +10,6 @@ import {
   FiHeart,
   FiSearch,
   FiShoppingCart,
-  FiSliders,
   FiStar,
 } from "react-icons/fi";
 import { Category } from "@/lib/api/categories";
@@ -32,9 +31,13 @@ const sortParamFor = (sort: (typeof sortOptions)[number]) => {
 export default function CategoryBrowsePage({
   category,
   otherCategories,
+  initialSearch = "",
+  browseAllProducts = false,
 }: {
   category: Category;
   otherCategories: Category[];
+  initialSearch?: string;
+  browseAllProducts?: boolean;
 }) {
   const router = useRouter();
   const { isAuthenticated } = useAuth();
@@ -46,7 +49,8 @@ export default function CategoryBrowsePage({
   const [activeSort, setActiveSort] = useState<(typeof sortOptions)[number]>(
     "Recommended",
   );
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState(initialSearch);
+  const [categorySearchTerm, setCategorySearchTerm] = useState("");
   const [savedMessage, setSavedMessage] = useState("");
   const [cartMessage, setCartMessage] = useState("");
 
@@ -54,7 +58,7 @@ export default function CategoryBrowsePage({
     setLoading(true);
 
     const response = await getProductsAction({
-      category: category.slug,
+      category: browseAllProducts ? undefined : category.slug,
       search: searchTerm || undefined,
       sort: sortParamFor(activeSort),
       limit: 60,
@@ -65,7 +69,7 @@ export default function CategoryBrowsePage({
     }
 
     setLoading(false);
-  }, [category.slug, searchTerm, activeSort]);
+  }, [category.slug, browseAllProducts, searchTerm, activeSort]);
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
@@ -86,7 +90,10 @@ export default function CategoryBrowsePage({
   }, [products, activeSort]);
 
   const requireLogin = () => {
-    router.push(`/login?redirect=${encodeURIComponent(`/categories/${category.slug}`)}`);
+    const redirectPath = browseAllProducts
+      ? `/categories${searchTerm ? `?search=${encodeURIComponent(searchTerm)}` : ""}`
+      : `/categories/${category.slug}`;
+    router.push(`/login?redirect=${encodeURIComponent(redirectPath)}`);
   };
 
   const handleSaveProduct = async (product: Product) => {
@@ -117,6 +124,27 @@ export default function CategoryBrowsePage({
     );
   };
 
+  const filteredCategories = useMemo(() => {
+    const query = categorySearchTerm.trim().toLowerCase();
+
+    return otherCategories
+      .filter((item) => browseAllProducts || item.slug !== category.slug)
+      .filter((item) => {
+        if (!query) return true;
+
+        return (
+          item.title.toLowerCase().includes(query) ||
+          item.slug.toLowerCase().includes(query) ||
+          item.description.toLowerCase().includes(query)
+        );
+      });
+  }, [browseAllProducts, category.slug, categorySearchTerm, otherCategories]);
+
+  const pageTitle = browseAllProducts ? "FreshCart Products" : category.title;
+  const pageDescription = browseAllProducts
+    ? "Search fresh produce, bakery, dairy, household, and everyday grocery picks."
+    : category.description;
+
   return (
     <>
       <div className="space-y-8">
@@ -140,19 +168,14 @@ export default function CategoryBrowsePage({
               Back to categories
             </Link>
             <p className="mt-7 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-100">
-              FreshCart Category
+              {browseAllProducts ? "FreshCart Search" : "FreshCart Category"}
             </p>
             <h1 className="mt-2 text-4xl font-semibold leading-tight sm:text-5xl">
-              {category.title}
+              {pageTitle}
             </h1>
             <p className="mt-4 max-w-2xl text-sm leading-6 text-emerald-50/90 sm:text-base">
-              {category.description}
+              {pageDescription}
             </p>
-            <div className="mt-6 flex flex-wrap gap-3">
-              <span className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#123821]">
-                {products.length} products
-              </span>
-            </div>
           </div>
         </section>
 
@@ -160,10 +183,12 @@ export default function CategoryBrowsePage({
           <div className="flex flex-col gap-4 border-b border-slate-100 pb-5 lg:flex-row lg:items-center lg:justify-between">
             <div>
               <h2 className="text-2xl font-semibold text-[#15251b]">
-                {category.title} Products
+                {browseAllProducts ? "Search Results" : `${category.title} Products`}
               </h2>
               <p className="mt-1 text-sm text-slate-500">
-                Showing only products from {category.title}.
+                {browseAllProducts
+                  ? "Search across every FreshCart grocery department."
+                  : `Showing only products from ${category.title}.`}
               </p>
             </div>
 
@@ -173,13 +198,13 @@ export default function CategoryBrowsePage({
                 <input
                   value={searchTerm}
                   onChange={(event) => setSearchTerm(event.target.value)}
-                  placeholder={`Search ${category.title.toLowerCase()}...`}
+                  placeholder={
+                    browseAllProducts
+                      ? "Search any product..."
+                      : `Search ${category.title.toLowerCase()}...`
+                  }
                   className="w-full bg-transparent outline-none placeholder:text-slate-400"
                 />
-              </div>
-              <div className="flex items-center gap-2 rounded-full bg-[#eef2ea] px-4 py-3 text-sm font-semibold text-slate-600">
-                <FiSliders size={16} />
-                Filter
               </div>
             </div>
           </div>
@@ -255,7 +280,7 @@ export default function CategoryBrowsePage({
 
                   <div className="p-4">
                     <p className="text-xs font-medium text-slate-400">
-                      {category.title}
+                      {product.category?.title || category.title}
                     </p>
                     <h3 className="mt-1 text-base font-semibold text-[#15251b]">
                       {product.name}
@@ -298,44 +323,49 @@ export default function CategoryBrowsePage({
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h2 className="text-xl font-semibold text-[#15251b]">
-                Browse another category
+                Browse categories
               </h2>
               <p className="mt-1 text-sm text-slate-500">
                 Jump between FreshCart grocery departments.
               </p>
             </div>
-            <Link
-              href="/"
-              className="inline-flex rounded-full bg-[#173822] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#0f2d1b]"
-            >
-              Back to dashboard
-            </Link>
+            <div className="flex items-center gap-2 rounded-full bg-white px-4 py-3 text-sm text-slate-600 shadow-sm sm:min-w-[260px]">
+              <FiSearch size={16} />
+              <input
+                value={categorySearchTerm}
+                onChange={(event) => setCategorySearchTerm(event.target.value)}
+                placeholder="Search category..."
+                className="w-full bg-transparent outline-none placeholder:text-slate-400"
+              />
+            </div>
           </div>
 
           <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {otherCategories
-              .filter((item) => item.slug !== category.slug)
-              .slice(0, 4)
-              .map((item) => (
-                <Link
-                  key={item.slug}
-                  href={`/categories/${item.slug}`}
-                  className="group relative min-h-36 overflow-hidden rounded-2xl bg-slate-900"
-                >
-                  <Image
-                    src={resolveImageUrl(item.image)}
-                    alt={item.title}
-                    fill
-                    sizes="(max-width: 640px) 100vw, 25vw"
-                    className="object-cover transition duration-300 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
-                  <div className="absolute bottom-4 left-4 right-4 text-white">
-                    <p className="font-semibold">{item.title}</p>
-                  </div>
-                </Link>
-              ))}
+            {filteredCategories.slice(0, 8).map((item) => (
+              <Link
+                key={item.slug}
+                href={`/categories/${item.slug}`}
+                className="group relative min-h-36 overflow-hidden rounded-2xl bg-slate-900"
+              >
+                <Image
+                  src={resolveImageUrl(item.image)}
+                  alt={item.title}
+                  fill
+                  sizes="(max-width: 640px) 100vw, 25vw"
+                  className="object-cover transition duration-300 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
+                <div className="absolute bottom-4 left-4 right-4 text-white">
+                  <p className="font-semibold">{item.title}</p>
+                </div>
+              </Link>
+            ))}
           </div>
+          {filteredCategories.length === 0 && (
+            <div className="mt-5 rounded-2xl border border-dashed border-[#d8e2d4] bg-white px-5 py-8 text-center text-sm text-slate-500">
+              No categories match your search.
+            </div>
+          )}
         </section>
       </div>
     </>
