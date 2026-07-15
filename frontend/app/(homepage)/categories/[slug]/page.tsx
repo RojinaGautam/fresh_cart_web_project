@@ -5,10 +5,13 @@ import { Category } from "@/lib/api/categories";
 
 export default async function CategoryPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams?: Promise<{ search?: string }>;
 }) {
   const { slug } = await params;
+  const resolvedSearchParams = await searchParams;
   const [categoryResponse, categoriesResponse] = await Promise.all([
     getCategoryAction(slug),
     getCategoriesAction(),
@@ -22,8 +25,14 @@ export default async function CategoryPage({
   const otherCategories = categoriesResponse.success
     ? (categoriesResponse.data as Category[])
     : [];
+  const initialSearch = resolvedSearchParams?.search || "";
 
   return (
-    <CategoryBrowsePage category={category} otherCategories={otherCategories} />
+    <CategoryBrowsePage
+      key={`${category.slug}-${initialSearch}`}
+      category={category}
+      otherCategories={otherCategories}
+      initialSearch={initialSearch}
+    />
   );
 }
