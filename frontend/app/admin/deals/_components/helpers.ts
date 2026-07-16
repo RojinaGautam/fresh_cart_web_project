@@ -4,6 +4,7 @@ export const emptyDealForm: AdminDealFormPayload = {
   title: "",
   description: "",
   product: "",
+  image: "",
   discountPercentage: "",
   badge: "",
   isActive: true,
@@ -32,6 +33,7 @@ export const validateDealForm = (form: AdminDealFormPayload) => {
   if (!form.title.trim()) return "Title is required";
   if (!form.description.trim()) return "Description is required";
   if (!form.product) return "Product is required";
+  if (!form.image.trim()) return "Please upload a deal image";
   if (
     !form.discountPercentage.trim() ||
     Number.isNaN(Number(form.discountPercentage)) ||

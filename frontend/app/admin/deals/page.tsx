@@ -79,6 +79,7 @@ export default function AdminDealsPage() {
       title: deal.title,
       description: deal.description,
       product: deal.product?.id || "",
+      image: deal.image || "",
       discountPercentage: String(deal.discountPercentage),
       badge: deal.badge,
       isActive: deal.isActive,
