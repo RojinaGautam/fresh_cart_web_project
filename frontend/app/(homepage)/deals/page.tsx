@@ -17,7 +17,7 @@ import { getDealsAction } from "@/lib/actions/deals-action";
 import { useAuth } from "@/lib/contexts/AuthContext";
 import { useCart } from "@/lib/contexts/CartContext";
 import { useWishlist } from "@/lib/contexts/WishlistContext";
-import { resolveImageUrl } from "@/lib/resolveImageUrl";
+import { FALLBACK_PRODUCT_IMAGE, resolveImageUrl } from "@/lib/resolveImageUrl";
 import { quickDealPages } from "./deal-pages";
 
 export default function DealsPage() {
@@ -164,7 +164,7 @@ export default function DealsPage() {
             >
               <div className="relative h-56 overflow-hidden bg-white">
                 <Image
-                  src={resolveImageUrl(deal.product?.image) || "/images/products/fallback-grocery.png"}
+                  src={resolveImageUrl(deal.image || deal.product?.image) || FALLBACK_PRODUCT_IMAGE}
                   alt={deal.title}
                   fill
                   quality={100}
@@ -192,11 +192,6 @@ export default function DealsPage() {
                 </p>
                 <div className="mt-4 flex items-center justify-between">
                   <div>
-                    {deal.product?.oldPrice && (
-                      <span className="text-xs font-semibold text-slate-400 line-through">
-                        ${deal.product.oldPrice.toFixed(2)}
-                      </span>
-                    )}
                     <p className="text-lg font-bold text-green-700">
                       ${deal.product?.price.toFixed(2)}
                     </p>

@@ -69,8 +69,13 @@ export default function DealTable({
                 <td className="px-5 py-4">
                   <div className="flex items-center gap-3">
                     <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-xl bg-slate-100">
-                      {deal.product?.image && (
-                        <Image src={resolveImageUrl(deal.product.image)} alt={deal.title} fill className="object-cover" />
+                      {(deal.image || deal.product?.image) && (
+                        <Image
+                          src={resolveImageUrl(deal.image || deal.product?.image)}
+                          alt={deal.title}
+                          fill
+                          className="object-cover"
+                        />
                       )}
                     </div>
                     <p className="font-semibold text-slate-950">{deal.title}</p>

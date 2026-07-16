@@ -6,6 +6,7 @@ export type AdminDealFormPayload = {
   title: string;
   description: string;
   product: string;
+  image: string;
   discountPercentage: string;
   badge: string;
   isActive: boolean;
@@ -15,6 +16,7 @@ export const buildDealPayload = (form: AdminDealFormPayload) => ({
   title: form.title.trim(),
   description: form.description.trim(),
   product: form.product,
+  image: form.image.trim(),
   discountPercentage: Number(form.discountPercentage),
   badge: form.badge.trim(),
   isActive: form.isActive,
