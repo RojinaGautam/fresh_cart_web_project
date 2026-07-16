@@ -16,6 +16,7 @@ import {
 import { FreshCartUser } from "../../lib/api/auth";
 import { useCart } from "../../lib/contexts/CartContext";
 import { useWishlist } from "../../lib/contexts/WishlistContext";
+import { useDeliveryLocation } from "../../lib/hooks/useDeliveryLocation";
 import Logo from "./Logo";
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
@@ -74,6 +75,10 @@ export default function Navbar({
   const [searchTerm, setSearchTerm] = useState("");
   const { cart } = useCart();
   const { wishlist } = useWishlist();
+  const { location, status, requestLocation } = useDeliveryLocation();
+
+  const locationLabel =
+    status === "loading" ? "Locating..." : `${location.city}, ${location.country}`;
 
   const cartCount = cart?.items.reduce((sum, item) => sum + item.quantity, 0) || 0;
   const wishlistCount = wishlist?.items.length || 0;
@@ -131,10 +136,15 @@ export default function Navbar({
 
         <div className="flex items-center gap-3">
           {variant === "storefront" && (
-            <div className="hidden items-center gap-2 rounded-full bg-[#e9efe6] px-3 py-2 text-[11px] font-semibold text-[#455846] lg:flex">
+            <button
+              type="button"
+              onClick={requestLocation}
+              title="Use my current location"
+              className="hidden items-center gap-2 rounded-full bg-[#e9efe6] px-3 py-2 text-[11px] font-semibold text-[#455846] transition hover:bg-[#dfeadb] lg:flex"
+            >
               <FiMapPin className="text-green-800" size={13} />
-              Deliver to New York, 10001
-            </div>
+              Deliver to {locationLabel}
+            </button>
           )}
           {user && (
             <Link
@@ -215,10 +225,15 @@ export default function Navbar({
           <div className="w-full rounded-2xl border border-[#dfe7dc] bg-white p-3 shadow-lg md:hidden">
             <nav className="grid gap-1 text-sm font-semibold text-slate-700">
               {variant === "storefront" && (
-                <div className="mb-1 flex items-center gap-2 rounded-xl bg-[#e9efe6] px-3 py-2 text-xs text-[#455846]">
+                <button
+                  type="button"
+                  onClick={requestLocation}
+                  title="Use my current location"
+                  className="mb-1 flex items-center gap-2 rounded-xl bg-[#e9efe6] px-3 py-2 text-left text-xs text-[#455846] transition hover:bg-[#dfeadb]"
+                >
                   <FiMapPin className="text-green-800" size={14} />
-                  Deliver to New York, 10001
-                </div>
+                  Deliver to {locationLabel}
+                </button>
               )}
               {navItems.map((item) => (
                 <Link
