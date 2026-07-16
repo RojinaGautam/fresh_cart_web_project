@@ -7,7 +7,6 @@ export type CartLineProduct = {
   slug: string;
   image: string;
   price: number;
-  oldPrice?: number;
   unit: string;
 };
 

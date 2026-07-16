@@ -4,6 +4,8 @@ import { FormEvent } from "react";
 import { FiSave, FiX } from "react-icons/fi";
 import { AdminDealFormPayload } from "../../../../lib/api/admin/deal";
 import { Product } from "../../../../lib/api/products";
+import { uploadAdminDealImageAction } from "../../../../lib/actions/admin/upload-action";
+import ImageUploadField from "../../_components/ImageUploadField";
 import Modal from "../../_components/Modal";
 
 export default function DealFormModal({
@@ -85,6 +87,13 @@ export default function DealFormModal({
               ))}
             </select>
           </label>
+
+          <ImageUploadField
+            label="Deal Image"
+            value={form.image}
+            onChange={(path) => onChange({ ...form, image: path })}
+            uploadAction={uploadAdminDealImageAction}
+          />
 
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="block">

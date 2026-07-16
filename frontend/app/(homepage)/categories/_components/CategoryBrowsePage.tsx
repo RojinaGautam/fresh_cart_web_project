@@ -20,7 +20,7 @@ import { useCart } from "@/lib/contexts/CartContext";
 import { useWishlist } from "@/lib/contexts/WishlistContext";
 import { resolveImageUrl } from "@/lib/resolveImageUrl";
 
-const sortOptions = ["Recommended", "Popular", "Newest", "Discounted"] as const;
+const sortOptions = ["Recommended", "Popular", "Newest"] as const;
 
 const sortParamFor = (sort: (typeof sortOptions)[number]) => {
   if (sort === "Popular") return "popular";
@@ -78,16 +78,6 @@ export default function CategoryBrowsePage({
 
     return () => window.clearTimeout(timeout);
   }, [fetchProducts]);
-
-  const visibleProducts = useMemo(() => {
-    if (activeSort !== "Discounted") return products;
-
-    return [...products].sort((a, b) => {
-      const discountA = (a.oldPrice || a.price) - a.price;
-      const discountB = (b.oldPrice || b.price) - b.price;
-      return discountB - discountA;
-    });
-  }, [products, activeSort]);
 
   const requireLogin = () => {
     const redirectPath = browseAllProducts
@@ -237,7 +227,7 @@ export default function CategoryBrowsePage({
             </p>
           )}
 
-          {!loading && visibleProducts.length === 0 ? (
+          {!loading && products.length === 0 ? (
             <div className="mt-8 rounded-3xl border border-dashed border-[#d8e2d4] bg-[#f7faf4] px-6 py-12 text-center">
               <FiGrid className="mx-auto text-emerald-700" size={30} />
               <h3 className="mt-3 text-lg font-semibold text-[#15251b]">
@@ -249,7 +239,7 @@ export default function CategoryBrowsePage({
             </div>
           ) : (
             <div className="mt-6 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
-              {visibleProducts.map((product) => (
+              {products.map((product) => (
                 <article
                   key={product.id}
                   className="group overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm ring-1 ring-transparent transition hover:-translate-y-1 hover:shadow-lg hover:ring-emerald-100"
@@ -295,11 +285,6 @@ export default function CategoryBrowsePage({
                     </div>
                     <div className="mt-4 flex items-center justify-between">
                       <div>
-                        {product.oldPrice && (
-                          <span className="text-xs text-slate-400 line-through">
-                            ${product.oldPrice.toFixed(2)}
-                          </span>
-                        )}
                         <p className="text-lg font-semibold text-green-800">
                           ${product.price.toFixed(2)}
                         </p>

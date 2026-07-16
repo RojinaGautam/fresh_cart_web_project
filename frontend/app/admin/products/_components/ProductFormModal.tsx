@@ -100,16 +100,6 @@ export default function ProductFormModal({
           </label>
 
           <label className="block">
-            <span className="text-xs font-semibold text-slate-700">Old Price</span>
-            <input
-              value={form.oldPrice}
-              onChange={(event) => onChange({ ...form, oldPrice: event.target.value })}
-              placeholder="4.20 (optional)"
-              className="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm font-semibold outline-none transition focus:border-emerald-400 focus:bg-white focus:ring-4 focus:ring-emerald-100"
-            />
-          </label>
-
-          <label className="block">
             <span className="text-xs font-semibold text-slate-700">Unit</span>
             <input
               value={form.unit}

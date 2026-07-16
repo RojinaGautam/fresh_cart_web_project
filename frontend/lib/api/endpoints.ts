@@ -23,5 +23,6 @@ export const API_ENDPOINTS = {
   ADMIN_SUPPORT: "/api/v1/admin/support",
   ADMIN_UPLOAD_CATEGORY_IMAGE: "/api/v1/admin/uploads/category-image",
   ADMIN_UPLOAD_PRODUCT_IMAGE: "/api/v1/admin/uploads/product-image",
+  ADMIN_UPLOAD_DEAL_IMAGE: "/api/v1/admin/uploads/deal-image",
   CHAT: "/api/v1/chat",
 };

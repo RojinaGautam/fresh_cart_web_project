@@ -108,11 +108,6 @@ export default function ProductTable({
                 </td>
                 <td className="px-5 py-4 font-semibold text-slate-950">
                   ${product.price.toFixed(2)}
-                  {product.oldPrice && (
-                    <span className="ml-2 text-xs text-slate-400 line-through">
-                      ${product.oldPrice.toFixed(2)}
-                    </span>
-                  )}
                 </td>
                 <td className="px-5 py-4 font-medium text-slate-600">{product.stock}</td>
                 <td className="px-5 py-4">

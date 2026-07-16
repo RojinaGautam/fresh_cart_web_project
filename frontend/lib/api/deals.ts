@@ -8,7 +8,6 @@ export type DealProduct = {
   slug: string;
   image: string;
   price: number;
-  oldPrice?: number;
   unit: string;
   category: ProductCategory | null;
 };
@@ -17,6 +16,7 @@ export type Deal = {
   id: string;
   title: string;
   description: string;
+  image: string;
   discountPercentage: number;
   badge: string;
   isActive: boolean;

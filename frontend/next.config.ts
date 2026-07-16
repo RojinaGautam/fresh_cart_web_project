@@ -5,6 +5,8 @@ const nextConfig: NextConfig = {
     root: __dirname,
   },
   images: {
+    dangerouslyAllowLocalIP: true,
+    qualities: [75, 90, 95],
     remotePatterns: [
       {
         protocol: "http",

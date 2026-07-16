@@ -26,3 +26,14 @@ export const uploadAdminProductImageApi = async (file: File) => {
   );
   return response.data;
 };
+
+export const uploadAdminDealImageApi = async (file: File) => {
+  const formData = new FormData();
+  formData.append("image", file);
+
+  const response = await axiosInstance.post(
+    API_ENDPOINTS.ADMIN_UPLOAD_DEAL_IMAGE,
+    formData,
+  );
+  return response.data;
+};

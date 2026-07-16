@@ -1,5 +1,6 @@
 import {
   uploadAdminCategoryImageApi,
+  uploadAdminDealImageApi,
   uploadAdminProductImageApi,
 } from "../../api/admin/upload";
 
@@ -28,6 +29,19 @@ export const uploadAdminCategoryImageAction = async (file: File) => {
 export const uploadAdminProductImageAction = async (file: File) => {
   try {
     return await uploadAdminProductImageApi(file);
+  } catch (error) {
+    const apiError = error as ApiError;
+    return apiError.response?.data || {
+      success: false,
+      message: "Failed to upload image",
+      data: null,
+    };
+  }
+};
+
+export const uploadAdminDealImageAction = async (file: File) => {
+  try {
+    return await uploadAdminDealImageApi(file);
   } catch (error) {
     const apiError = error as ApiError;
     return apiError.response?.data || {

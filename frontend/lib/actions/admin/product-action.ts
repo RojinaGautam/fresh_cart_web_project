@@ -21,6 +21,7 @@ export const getAdminProductsAction = async (params: {
   limit: number;
   search?: string;
   category?: string;
+  featured?: boolean;
 }) => {
   try {
     return await getAdminProductsApi(params);
