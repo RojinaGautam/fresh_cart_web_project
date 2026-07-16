@@ -15,7 +15,6 @@ export type Product = {
   description?: string;
   category: ProductCategory | null;
   price: number;
-  oldPrice?: number;
   image: string;
   tag?: string;
   unit: string;
