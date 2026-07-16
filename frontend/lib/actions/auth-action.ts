@@ -1,8 +1,10 @@
 import {
+  Address,
   loginApi,
   LoginPayload,
   registerApi,
   RegisterPayload,
+  updateAddressesApi,
   updateProfileApi,
   updatePasswordApi,
   UpdatePasswordPayload,
@@ -112,6 +114,21 @@ export const updateProfileAction = async (formData: FormData) => {
     return apiError.response?.data || {
       success: false,
       message: "Profile update failed",
+    };
+  }
+};
+
+export const updateAddressesAction = async (
+  addresses: Array<Omit<Address, "id"> & { id?: string }>,
+) => {
+  try {
+    const response = await updateAddressesApi(addresses);
+    return response;
+  } catch (error) {
+    const apiError = error as ApiError;
+    return apiError.response?.data || {
+      success: false,
+      message: "Failed to update addresses",
     };
   }
 };

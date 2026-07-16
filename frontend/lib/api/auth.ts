@@ -13,6 +13,13 @@ export type LoginPayload = {
   password: string;
 };
 
+export type Address = {
+  id: string;
+  label: string;
+  street: string;
+  city: string;
+};
+
 export type FreshCartUser = {
   id: string;
   fullName: string;
@@ -21,6 +28,7 @@ export type FreshCartUser = {
   profileImage?: string | null;
   role: string;
   isVerified: boolean;
+  addresses?: Address[];
   createdAt?: string;
   updatedAt?: string;
 };
@@ -85,6 +93,15 @@ export const updateProfileApi = async (payload: FormData) => {
     API_ENDPOINTS.UPDATE_PROFILE,
     payload,
   );
+  return response.data;
+};
+
+export const updateAddressesApi = async (
+  addresses: Array<Omit<Address, "id"> & { id?: string }>,
+) => {
+  const response = await axiosInstance.patch(API_ENDPOINTS.UPDATE_PROFILE, {
+    addresses,
+  });
   return response.data;
 };
 

@@ -17,11 +17,13 @@ import {
   FiTruck,
 } from "react-icons/fi";
 import { Avatar } from "@/app/_components/AccountShell";
-import { resolveImageUrl } from "@/lib/resolveImageUrl";
+import { FALLBACK_PRODUCT_IMAGE, resolveImageUrl } from "@/lib/resolveImageUrl";
 import { useAuth } from "@/lib/contexts/AuthContext";
 import { useWishlist } from "@/lib/contexts/WishlistContext";
+import { Address, FreshCartUser } from "@/lib/api/auth";
 import { Order } from "@/lib/api/orders";
 import { getOrdersAction } from "@/lib/actions/orders-action";
+import { updateAddressesAction } from "@/lib/actions/auth-action";
 
 const formatDate = (date?: string) => {
   if (!date) return "March 12, 1994";
@@ -54,26 +56,12 @@ const coupons = [
   { code: "GREEN10", text: "$10 off orders above $60", expires: "Expires Aug 12" },
 ];
 
-type SavedAddress = {
-  id: string;
-  label: string;
-  street: string;
-  city: string;
-};
-
 export default function ProfilePage() {
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();
   const { wishlist } = useWishlist();
   const [orders, setOrders] = useState<Order[]>([]);
   const [ordersTotal, setOrdersTotal] = useState(0);
-  const [addresses, setAddresses] = useState<SavedAddress[]>([
-    {
-      id: "home",
-      label: "Home",
-      street: "123 Highland Terrace, Apt 4B",
-      city: "Portland, OR 97202",
-    },
-  ]);
+  const [addresses, setAddresses] = useState<Address[]>(user?.addresses || []);
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [editingAddressId, setEditingAddressId] = useState("");
   const [addressForm, setAddressForm] = useState({
@@ -81,6 +69,12 @@ export default function ProfilePage() {
     street: "",
     city: "",
   });
+  const [savingAddress, setSavingAddress] = useState(false);
+  const [addressError, setAddressError] = useState("");
+
+  useEffect(() => {
+    setAddresses(user?.addresses || []);
+  }, [user?.addresses]);
 
   useEffect(() => {
     void (async () => {
@@ -119,7 +113,7 @@ export default function ProfilePage() {
     setShowAddressForm(true);
   };
 
-  const handleEditAddress = (address: SavedAddress) => {
+  const handleEditAddress = (address: Address) => {
     setAddressForm({
       label: address.label,
       street: address.street,
@@ -129,46 +123,58 @@ export default function ProfilePage() {
     setShowAddressForm(true);
   };
 
-  const handleDeleteAddress = (id: string) => {
-    setAddresses((current) => current.filter((address) => address.id !== id));
+  const persistAddresses = async (nextAddresses: Array<Omit<Address, "id"> & { id?: string }>) => {
+    setAddressError("");
+    setSavingAddress(true);
+    const response = await updateAddressesAction(nextAddresses);
+    setSavingAddress(false);
 
-    if (editingAddressId === id) {
+    if (!response.success) {
+      setAddressError(response.message || "Failed to save address.");
+      return false;
+    }
+
+    setUser(response.data as FreshCartUser);
+    return true;
+  };
+
+  const handleDeleteAddress = async (id: string) => {
+    const nextAddresses = addresses
+      .filter((address) => address.id !== id)
+      .map(({ id: addressId, label, street, city }) => ({ id: addressId, label, street, city }));
+
+    const success = await persistAddresses(nextAddresses);
+
+    if (success && editingAddressId === id) {
       closeAddressForm();
     }
   };
 
-  const handleSaveAddress = () => {
+  const handleSaveAddress = async () => {
     if (!addressForm.label.trim() || !addressForm.street.trim() || !addressForm.city.trim()) {
       return;
     }
 
-    if (editingAddressId) {
-      setAddresses((current) =>
-        current.map((address) =>
-          address.id === editingAddressId
-            ? {
-                ...address,
-                label: addressForm.label.trim(),
-                street: addressForm.street.trim(),
-                city: addressForm.city.trim(),
-              }
-            : address,
-        ),
-      );
-      closeAddressForm();
-      return;
-    }
+    const trimmedForm = {
+      label: addressForm.label.trim(),
+      street: addressForm.street.trim(),
+      city: addressForm.city.trim(),
+    };
 
-    setAddresses((current) => [
-      ...current,
-      {
-        id: `${Date.now()}`,
-        label: addressForm.label.trim(),
-        street: addressForm.street.trim(),
-        city: addressForm.city.trim(),
-      },
-    ]);
-    closeAddressForm();
+    const nextAddresses = editingAddressId
+      ? addresses.map(({ id, label, street, city }) =>
+          id === editingAddressId ? { id, ...trimmedForm } : { id, label, street, city },
+        )
+      : [
+          ...addresses.map(({ id, label, street, city }) => ({ id, label, street, city })),
+          trimmedForm,
+        ];
+
+    const success = await persistAddresses(nextAddresses);
+
+    if (success) {
+      closeAddressForm();
+    }
   };
 
   return (
@@ -297,6 +303,18 @@ export default function ProfilePage() {
             </button>
           </div>
 
+          {addressError && (
+            <p className="mt-3 rounded-xl border border-red-100 bg-red-50 px-3 py-2 text-xs font-semibold text-red-600">
+              {addressError}
+            </p>
+          )}
+
+          {addresses.length === 0 && !showAddressForm && (
+            <p className="mt-5 rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-4 py-6 text-center text-sm text-slate-500">
+              No saved addresses yet. Add one to speed up checkout.
+            </p>
+          )}
+
           <div className="mt-5 space-y-3">
             {addresses.map((address) => (
               <div
@@ -378,10 +396,15 @@ export default function ProfilePage() {
               <button
                 type="button"
                 onClick={handleSaveAddress}
-                className="mt-3 flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700"
+                disabled={savingAddress}
+                className="mt-3 flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <FiPlus size={16} />
-                {editingAddressId ? "Save Address Changes" : "Save Address"}
+                {savingAddress
+                  ? "Saving..."
+                  : editingAddressId
+                    ? "Save Address Changes"
+                    : "Save Address"}
               </button>
             </div>
           )}
@@ -430,7 +453,7 @@ export default function ProfilePage() {
                 <div className="flex items-center gap-4">
                   <div className="relative h-16 w-16 overflow-hidden rounded-2xl bg-slate-50">
                     <Image
-                      src={resolveImageUrl(order.items[0]?.image) || "/images/products/fallback-grocery.png"}
+                      src={resolveImageUrl(order.items[0]?.image) || FALLBACK_PRODUCT_IMAGE}
                       alt={order.orderNumber}
                       fill
                       className="object-cover"

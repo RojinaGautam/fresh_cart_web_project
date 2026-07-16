@@ -17,6 +17,7 @@ import {
   FiTruck,
 } from "react-icons/fi";
 import { useCart } from "@/lib/contexts/CartContext";
+import { useAuth } from "@/lib/contexts/AuthContext";
 import { createOrderAction } from "@/lib/actions/orders-action";
 import ProtectedRoute from "@/app/_components/ProtectedRoute";
 import { resolveImageUrl } from "@/lib/resolveImageUrl";
@@ -30,9 +31,21 @@ type CheckoutDetails = {
   deliveryTime: string;
 };
 
+export const formatSavedAddress = (savedAddress: { street: string; city: string }) =>
+  `${savedAddress.street}, ${savedAddress.city}`;
+
+export const getMinDeliveryDate = () => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
 export default function CartPage() {
   const router = useRouter();
   const { cart, updateItem, removeItem, refetch } = useCart();
+  const { user } = useAuth();
   const [address, setAddress] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("Card ending in 4242");
   const [deliveryDate, setDeliveryDate] = useState("");
@@ -42,6 +55,8 @@ export default function CartPage() {
   const [orderNumber, setOrderNumber] = useState("");
 
   const cartItems = cart?.items || [];
+  const savedAddresses = user?.addresses || [];
+  const minDeliveryDate = useMemo(() => getMinDeliveryDate(), []);
 
   useEffect(() => {
     let timeoutId: number | undefined;
@@ -54,7 +69,8 @@ export default function CartPage() {
       timeoutId = window.setTimeout(() => {
         setAddress(details.address || "");
         setPaymentMethod(details.paymentMethod || "Card ending in 4242");
-        setDeliveryDate(details.deliveryDate || "");
+        const restoredDate = details.deliveryDate || "";
+        setDeliveryDate(restoredDate >= minDeliveryDate ? restoredDate : "");
         setDeliveryTime(details.deliveryTime || "09:00-11:00");
       }, 0);
     } catch {
@@ -64,7 +80,7 @@ export default function CartPage() {
     return () => {
       if (timeoutId) window.clearTimeout(timeoutId);
     };
-  }, []);
+  }, [minDeliveryDate]);
 
   useEffect(() => {
     window.localStorage.setItem(
@@ -109,6 +125,11 @@ export default function CartPage() {
 
     if (!deliveryDate) {
       setCheckoutError("Please choose a delivery date.");
+      return;
+    }
+
+    if (deliveryDate < minDeliveryDate) {
+      setCheckoutError("Please choose a future delivery date.");
       return;
     }
 
@@ -333,6 +354,31 @@ export default function CartPage() {
                 <p className="text-sm text-gray-500">Add where we should deliver.</p>
               </div>
             </div>
+
+            {savedAddresses.length > 0 && (
+              <div className="mt-4 flex flex-wrap gap-2">
+                {savedAddresses.map((savedAddress) => {
+                  const formatted = formatSavedAddress(savedAddress);
+                  const isSelected = address === formatted;
+
+                  return (
+                    <button
+                      key={savedAddress.id}
+                      type="button"
+                      onClick={() => setAddress(formatted)}
+                      className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+                        isSelected
+                          ? "border-emerald-600 bg-[#173822] text-white"
+                          : "border-[#d8e2d4] bg-[#f7faf4] text-gray-600 hover:border-emerald-400"
+                      }`}
+                    >
+                      {savedAddress.label}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
             <textarea
               value={address}
               onChange={(event) => setAddress(event.target.value)}
@@ -381,6 +427,7 @@ export default function CartPage() {
               <input
                 type="date"
                 value={deliveryDate}
+                min={minDeliveryDate}
                 onChange={(event) => setDeliveryDate(event.target.value)}
                 className="rounded-2xl border border-[#d8e2d4] bg-[#f7faf4] px-4 py-3 text-sm outline-none focus:border-emerald-400 focus:bg-white focus:ring-4 focus:ring-emerald-100"
               />
