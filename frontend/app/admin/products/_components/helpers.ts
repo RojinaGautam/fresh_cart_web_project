@@ -6,7 +6,6 @@ export const emptyProductForm: AdminProductFormPayload = {
   description: "",
   category: "",
   price: "",
-  oldPrice: "",
   image: "",
   tag: "",
   unit: "",
@@ -40,9 +39,6 @@ export const validateProductForm = (form: AdminProductFormPayload) => {
   if (!form.category) return "Category is required";
   if (!form.price.trim() || Number.isNaN(Number(form.price))) {
     return "A valid price is required";
-  }
-  if (form.oldPrice.trim() && Number.isNaN(Number(form.oldPrice))) {
-    return "Old price must be a number";
   }
   if (!form.image.trim()) return "Please upload a product image";
 
