@@ -8,7 +8,6 @@ export type AdminProductFormPayload = {
   description: string;
   category: string;
   price: string;
-  oldPrice: string;
   image: string;
   tag: string;
   unit: string;
@@ -39,10 +38,6 @@ export const buildProductPayload = (form: AdminProductFormPayload) => {
     isActive: form.isActive,
   };
 
-  if (form.oldPrice.trim()) {
-    payload.oldPrice = Number(form.oldPrice);
-  }
-
   return payload;
 };
 
@@ -51,6 +46,7 @@ export const getAdminProductsApi = async (params: {
   limit: number;
   search?: string;
   category?: string;
+  featured?: boolean;
 }) => {
   const response = await axiosInstance.get(API_ENDPOINTS.ADMIN_PRODUCTS, {
     params,

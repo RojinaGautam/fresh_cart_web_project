@@ -22,6 +22,7 @@ export default function AdminProductsPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [meta, setMeta] = useState<AdminMeta>({ page: 1, limit: 10, total: 0, totalPages: 0 });
   const [search, setSearch] = useState("");
+  const [featuredOnly, setFeaturedOnly] = useState(false);
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [loading, setLoading] = useState(true);
@@ -40,7 +41,12 @@ export default function AdminProductsPage() {
       setLoading(true);
       setError("");
 
-      const response = await getAdminProductsAction({ page, limit, search });
+      const response = await getAdminProductsAction({
+        page,
+        limit,
+        search,
+        featured: featuredOnly || undefined,
+      });
 
       if (!response.success) {
         setError(response.message || "Unable to load products");
@@ -54,7 +60,7 @@ export default function AdminProductsPage() {
     } finally {
       setLoading(false);
     }
-  }, [limit, page, search]);
+  }, [limit, page, search, featuredOnly]);
 
   useEffect(() => {
     void (async () => {
@@ -74,11 +80,16 @@ export default function AdminProductsPage() {
   }, [fetchProducts]);
 
   const openCreateModal = () => {
-    setForm(emptyProductForm);
+    setForm({ ...emptyProductForm, isFeatured: featuredOnly });
     setEditingProduct(null);
     setFormError("");
     setSuccessMessage("");
     setModalMode("create");
+  };
+
+  const handleFeaturedTabChange = (nextFeaturedOnly: boolean) => {
+    setFeaturedOnly(nextFeaturedOnly);
+    setPage(1);
   };
 
   const openEditModal = (product: Product) => {
@@ -89,7 +100,6 @@ export default function AdminProductsPage() {
       description: product.description || "",
       category: product.category?.id || "",
       price: String(product.price),
-      oldPrice: product.oldPrice ? String(product.oldPrice) : "",
       image: product.image,
       tag: product.tag || "",
       unit: product.unit,
@@ -202,6 +212,30 @@ export default function AdminProductsPage() {
           </div>
 
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <div className="flex items-center gap-1 rounded-xl bg-slate-100 p-1">
+              <button
+                type="button"
+                onClick={() => handleFeaturedTabChange(false)}
+                className={`rounded-lg px-3 py-2 text-xs font-semibold transition ${
+                  !featuredOnly
+                    ? "bg-white text-slate-950 shadow-sm"
+                    : "text-slate-500 hover:text-slate-700"
+                }`}
+              >
+                All Products
+              </button>
+              <button
+                type="button"
+                onClick={() => handleFeaturedTabChange(true)}
+                className={`rounded-lg px-3 py-2 text-xs font-semibold transition ${
+                  featuredOnly
+                    ? "bg-white text-slate-950 shadow-sm"
+                    : "text-slate-500 hover:text-slate-700"
+                }`}
+              >
+                Trending Now
+              </button>
+            </div>
             <div className="relative w-full sm:w-[360px]">
               <FiSearch
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
