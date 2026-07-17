@@ -2,7 +2,7 @@ import { CartModel, ICart } from "../models/cart.model";
 
 const populateOptions = {
   path: "items.product",
-  select: "name slug image price oldPrice unit isActive",
+  select: "name slug image price unit isActive",
 };
 
 export interface ICartRepository {
