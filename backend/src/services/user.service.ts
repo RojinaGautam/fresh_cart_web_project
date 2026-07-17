@@ -1,5 +1,6 @@
 import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
 import { SECRET_KEY } from "../configs/constant";
 import {
   CreateUserDTO,
@@ -12,7 +13,7 @@ import {
   VerifyEmailDTO,
 } from "../dtos/user.dto";
 import { HttpException } from "../exceptions/http-exception";
-import { IUser } from "../models/user.model";
+import { IAddress, IUser } from "../models/user.model";
 import { UserMongoRepository } from "../repositories/user.repository";
 import {
   sendPasswordResetEmail,
@@ -32,6 +33,13 @@ const isDuplicateKeyError = (error: unknown) =>
 
 const generateOtp = () => Math.floor(100000 + Math.random() * 900000).toString();
 
+export type PublicAddress = {
+  id: string;
+  label: string;
+  street: string;
+  city: string;
+};
+
 export type PublicUser = {
   id: string;
   fullName: string;
@@ -40,6 +48,7 @@ export type PublicUser = {
   profileImage?: string | null;
   role: string;
   isVerified: boolean;
+  addresses: PublicAddress[];
   createdAt?: Date;
   updatedAt?: Date;
 };
@@ -54,6 +63,12 @@ export class UserService {
       profileImage: user.profileImage || null,
       role: user.role,
       isVerified: user.isVerified,
+      addresses: (user.addresses || []).map((address) => ({
+        id: address._id.toString(),
+        label: address.label,
+        street: address.street,
+        city: address.city,
+      })),
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     };
@@ -253,7 +268,24 @@ export class UserService {
     userId: string,
     profileData: UpdateProfileDTO,
   ): Promise<PublicUser> {
-    const updatedUser = await userRepository.update(userId, profileData);
+    const { addresses, ...rest } = profileData;
+    const updatePayload: Partial<IUser> = { ...rest };
+
+    if (addresses) {
+      updatePayload.addresses = addresses.map(
+        (address): IAddress => ({
+          _id:
+            address.id && mongoose.isValidObjectId(address.id)
+              ? new mongoose.Types.ObjectId(address.id)
+              : new mongoose.Types.ObjectId(),
+          label: address.label,
+          street: address.street,
+          city: address.city,
+        }),
+      );
+    }
+
+    const updatedUser = await userRepository.update(userId, updatePayload);
 
     if (!updatedUser) {
       throw new HttpException(404, "User not found");
