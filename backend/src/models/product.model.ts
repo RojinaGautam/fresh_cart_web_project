@@ -42,10 +42,6 @@ const ProductMongoSchema: Schema<IProduct> = new Schema(
       required: true,
     },
 
-    oldPrice: {
-      type: Number,
-    },
-
     image: {
       type: String,
       required: true,

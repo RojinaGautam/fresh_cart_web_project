@@ -11,8 +11,6 @@ export const ProductSchema = z.object({
 
   price: z.number().positive("Price must be a positive number"),
 
-  oldPrice: z.number().positive().optional(),
-
   image: z.string().min(1, "Image is required"),
 
   tag: z.string().optional(),
