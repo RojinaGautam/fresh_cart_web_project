@@ -22,6 +22,7 @@ export class AdminProductController {
         limit: req.query.limit as string | undefined,
         search: req.query.search as string | undefined,
         category: req.query.category as string | undefined,
+        featured: req.query.featured as string | undefined,
       });
 
       return ApiResponseHelper.success(

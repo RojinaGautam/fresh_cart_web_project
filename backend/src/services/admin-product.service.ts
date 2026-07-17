@@ -21,6 +21,7 @@ export type AdminProductListParams = {
   limit?: string;
   search?: string;
   category?: string;
+  featured?: string;
 };
 
 export type AdminProductListResult = {
@@ -63,6 +64,7 @@ export class AdminProductService {
       limit,
       search: params.search,
       categoryId: params.category,
+      featured: params.featured === "true",
     });
     const totalPages = Math.ceil(result.total / limit);
 
