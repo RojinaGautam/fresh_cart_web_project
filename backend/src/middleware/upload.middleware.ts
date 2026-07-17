@@ -41,3 +41,4 @@ const createImageUploader = (subfolder: string) => {
 export const uploadProfileImage = createImageUploader("profile");
 export const uploadCategoryImage = createImageUploader("categories");
 export const uploadProductImage = createImageUploader("products");
+export const uploadDealImage = createImageUploader("deals");

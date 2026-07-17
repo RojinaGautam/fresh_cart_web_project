@@ -37,4 +37,22 @@ export class AdminUploadController {
       );
     }
   }
+
+  async uploadDealImage(req: Request, res: Response) {
+    try {
+      if (!req.file) {
+        return ApiResponseHelper.error(res, "Image is required", 400);
+      }
+
+      const path = `/uploads/deals/${req.file.filename}`;
+
+      return ApiResponseHelper.success(res, { path }, "Image uploaded successfully");
+    } catch (error: Error | any | unknown) {
+      return ApiResponseHelper.error(
+        res,
+        error.message || "Internal Server Error",
+        error.status || 500,
+      );
+    }
+  }
 }
