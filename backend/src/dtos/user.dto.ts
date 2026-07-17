@@ -19,6 +19,16 @@ export const LoginUserDTO = UserSchema.pick({
 
 export type LoginUserDTO = z.infer<typeof LoginUserDTO>;
 
+// DTO for a saved delivery address
+export const AddressDTO = z.object({
+  id: z.string().optional(),
+  label: z.string().min(1, "Label is required"),
+  street: z.string().min(1, "Street is required"),
+  city: z.string().min(1, "City is required"),
+});
+
+export type AddressDTO = z.infer<typeof AddressDTO>;
+
 // DTO for profile update
 export const UpdateProfileDTO = z.object({
   fullName: z.string().min(1, "Full name is required").optional(),
@@ -27,6 +37,7 @@ export const UpdateProfileDTO = z.object({
     .min(10, "Phone number must be at least 10 digits long")
     .optional(),
   profileImage: z.string().nullable().optional(),
+  addresses: z.array(AddressDTO).optional(),
 });
 
 export type UpdateProfileDTO = z.infer<typeof UpdateProfileDTO>;
