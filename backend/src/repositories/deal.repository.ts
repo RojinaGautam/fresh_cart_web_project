@@ -13,7 +13,7 @@ export type PaginatedDeals = {
 
 const populateOptions = {
   path: "product",
-  select: "name slug image price oldPrice unit category",
+  select: "name slug image price unit category",
   populate: { path: "category", select: "title slug" },
 };
 

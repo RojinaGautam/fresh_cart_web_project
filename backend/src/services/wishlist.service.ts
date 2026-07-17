@@ -15,7 +15,6 @@ export type PublicWishlistItem = {
     slug: string;
     image: string;
     price: number;
-    oldPrice?: number;
     unit: string;
   };
   addedAt: Date;
@@ -40,7 +39,6 @@ export class WishlistService {
             slug: product.slug,
             image: product.image,
             price: product.price,
-            oldPrice: product.oldPrice,
             unit: product.unit || "",
           },
           addedAt: item.addedAt,

@@ -16,7 +16,6 @@ export type PublicCartItem = {
     slug: string;
     image: string;
     price: number;
-    oldPrice?: number;
     unit: string;
   };
   quantity: number;
@@ -43,7 +42,6 @@ export class CartService {
             slug: product.slug,
             image: product.image,
             price: product.price,
-            oldPrice: product.oldPrice,
             unit: product.unit || "",
           },
           quantity: item.quantity,
