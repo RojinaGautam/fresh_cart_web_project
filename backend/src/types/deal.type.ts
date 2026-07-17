@@ -7,6 +7,8 @@ export const DealSchema = z.object({
 
   product: z.string().min(1, "Product is required"),
 
+  image: z.string().min(1, "Image is required"),
+
   discountPercentage: z
     .number()
     .min(0, "Discount percentage cannot be negative")

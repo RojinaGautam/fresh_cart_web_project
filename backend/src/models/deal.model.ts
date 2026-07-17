@@ -28,6 +28,11 @@ const DealMongoSchema: Schema<IDeal> = new Schema(
       required: true,
     },
 
+    image: {
+      type: String,
+      required: true,
+    },
+
     discountPercentage: {
       type: Number,
       required: true,

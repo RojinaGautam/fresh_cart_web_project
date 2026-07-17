@@ -12,7 +12,6 @@ export type PublicDealProduct = {
   slug: string;
   image: string;
   price: number;
-  oldPrice?: number;
   unit: string;
   category: { id: string; title: string; slug: string } | null;
 };
@@ -21,6 +20,7 @@ export type PublicDeal = {
   id: string;
   title: string;
   description: string;
+  image: string;
   discountPercentage: number;
   badge: string;
   isActive: boolean;
@@ -48,7 +48,6 @@ export class DealService {
         slug: product.slug,
         image: product.image,
         price: product.price,
-        oldPrice: product.oldPrice,
         unit: product.unit || "",
         category: isPopulatedCategory
           ? {
@@ -64,6 +63,7 @@ export class DealService {
       id: deal._id.toString(),
       title: deal.title,
       description: deal.description,
+      image: deal.image || publicProduct?.image || "",
       discountPercentage: deal.discountPercentage,
       badge: deal.badge,
       isActive: deal.isActive,
