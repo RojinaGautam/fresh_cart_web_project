@@ -5,10 +5,25 @@ import {
   PAYMENT_METHODS,
 } from "../types/order.type";
 
+const dateStringRegex = /^\d{4}-\d{2}-\d{2}$/;
+
+const getTodayDateString = () => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
 export const CreateOrderDTO = z.object({
   shippingAddress: z.string().min(1, "Shipping address is required"),
   paymentMethod: z.enum(PAYMENT_METHODS),
-  deliveryDate: z.string().min(1, "Delivery date is required"),
+  deliveryDate: z
+    .string()
+    .regex(dateStringRegex, "Delivery date must be in YYYY-MM-DD format")
+    .refine((value) => value >= getTodayDateString(), {
+      message: "Delivery date must be today or a future date",
+    }),
   deliveryTimeSlot: z.enum(DELIVERY_TIME_SLOTS),
 });
 
