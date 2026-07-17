@@ -37,6 +37,12 @@ export class AdminUserService {
       profileImage: user.profileImage || null,
       role: user.role,
       isVerified: user.isVerified,
+      addresses: (user.addresses || []).map((address) => ({
+        id: address._id.toString(),
+        label: address.label,
+        street: address.street,
+        city: address.city,
+      })),
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     };

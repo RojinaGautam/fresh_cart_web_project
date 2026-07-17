@@ -1,9 +1,17 @@
 import mongoose, { Schema, Document } from "mongoose";
 import { UserType } from "../types/user.type";
 
+export interface IAddress {
+  _id: mongoose.Types.ObjectId;
+  label: string;
+  street: string;
+  city: string;
+}
+
 export interface IUser extends UserType, Document {
   _id: mongoose.Types.ObjectId;
   isVerified: boolean;
+  addresses: IAddress[];
   emailVerificationOtp?: string | null;
   emailVerificationOtpExpires?: Date | null;
   passwordResetOtp?: string | null;
@@ -11,6 +19,29 @@ export interface IUser extends UserType, Document {
   createdAt: Date;
   updatedAt: Date;
 }
+
+const AddressMongoSchema = new Schema<IAddress>(
+  {
+    label: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
+    street: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
+    city: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+  },
+  { _id: true },
+);
 
 const UserMongoSchema: Schema<IUser> = new Schema(
   {
@@ -48,6 +79,11 @@ const UserMongoSchema: Schema<IUser> = new Schema(
       type: String,
       enum: ["admin", "user"],
       default: "user",
+    },
+
+    addresses: {
+      type: [AddressMongoSchema],
+      default: [],
     },
 
     isVerified: {

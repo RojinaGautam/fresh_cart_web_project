@@ -24,7 +24,6 @@ export type PublicProduct = {
   description?: string;
   category: PublicProductCategory | null;
   price: number;
-  oldPrice?: number;
   image: string;
   tag?: string;
   unit: string;
@@ -76,7 +75,6 @@ export class ProductService {
           }
         : null,
       price: product.price,
-      oldPrice: product.oldPrice,
       image: product.image,
       tag: product.tag,
       unit: product.unit || "",
