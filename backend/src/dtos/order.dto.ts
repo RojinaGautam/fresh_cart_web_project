@@ -7,13 +7,7 @@ import {
 
 const dateStringRegex = /^\d{4}-\d{2}-\d{2}$/;
 
-const getTodayDateString = () => {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, "0");
-  const day = String(now.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-};
+const getTodayDateString = () => new Date().toISOString().slice(0, 10);
 
 export const CreateOrderDTO = z.object({
   shippingAddress: z.string().min(1, "Shipping address is required"),
