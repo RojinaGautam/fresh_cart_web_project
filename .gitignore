@@ -14,3 +14,6 @@ backend/node_modules/
 backend/.env
 backend/public/profiles/
 backend/uploads/profile/
+backend/coverage/
+frontend/coverage/
+*.tsbuildinfo
