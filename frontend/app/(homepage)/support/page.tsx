@@ -12,7 +12,6 @@ import {
   FiPackage,
   FiPhone,
   FiRefreshCcw,
-  FiSearch,
   FiTruck,
   FiUser,
 } from "react-icons/fi";
@@ -96,13 +95,6 @@ export default function SupportPage() {
               Find support for your account, orders, delivery, payment, and
               FreshCart profile in one calm place.
             </p>
-            <div className="mt-6 flex max-w-xl items-center rounded-full bg-white px-4 py-3 text-gray-500 shadow-sm ring-1 ring-[#d8e2d4]">
-              <FiSearch size={18} />
-              <input
-                placeholder="Search account, order, delivery..."
-                className="ml-3 w-full bg-transparent text-sm font-medium outline-none placeholder:text-gray-400"
-              />
-            </div>
           </div>
         </div>
       </section>
