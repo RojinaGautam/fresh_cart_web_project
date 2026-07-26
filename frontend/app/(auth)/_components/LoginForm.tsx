@@ -23,8 +23,6 @@ export default function LoginForm({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const [rememberMe, setRememberMe] = useState(false);
-
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [showResend, setShowResend] = useState(false);
@@ -249,21 +247,6 @@ export default function LoginForm({
                       className="w-full rounded-xl border border-slate-200 bg-slate-50 px-10 py-3 text-sm font-semibold text-slate-950 outline-none transition focus:border-emerald-400 focus:bg-white focus:ring-4 focus:ring-emerald-100"
                     />
                   </div>
-                </div>
-
-                {/* Remember Me */}
-                <div className="flex items-center gap-2">
-                  <input
-                    id="remember"
-                    type="checkbox"
-                    checked={rememberMe}
-                    onChange={(e) => setRememberMe(e.target.checked)}
-                    className="h-4 w-4 accent-green-600"
-                  />
-
-                  <label htmlFor="remember" className="text-sm font-medium text-slate-600">
-                    Remember Me
-                  </label>
                 </div>
 
                 {/* Error Message */}
