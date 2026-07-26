@@ -42,6 +42,11 @@ export const getMinDeliveryDate = () => {
   return `${year}-${month}-${day}`;
 };
 
+const formatUnit = (unit?: string) => {
+  const cleanUnit = unit?.replace("/", "").trim();
+  return cleanUnit || "item";
+};
+
 export default function CartPage() {
   const router = useRouter();
   const { cart, updateItem, removeItem, refetch } = useCart();
@@ -249,6 +254,9 @@ export default function CartPage() {
                     <h3 className="mt-1 text-base font-semibold text-[#15251b]">
                       {item.product.name}
                     </h3>
+                    <p className="mt-1 text-sm text-gray-500">
+                      {item.quantity} {formatUnit(item.product.unit)} selected
+                    </p>
                     <button
                       type="button"
                       onClick={() => handleRemove(item.product.id)}
@@ -273,7 +281,7 @@ export default function CartPage() {
                         <FiMinus size={14} />
                       </button>
                       <span className="min-w-6 text-center text-sm font-semibold">
-                        {item.quantity}
+                        {item.quantity} {formatUnit(item.product.unit)}
                       </span>
                       <button
                         type="button"
