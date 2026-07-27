@@ -21,8 +21,13 @@ export const API_ENDPOINTS = {
   ADMIN_ORDERS: "/api/v1/admin/orders",
   SUPPORT: "/api/v1/support",
   ADMIN_SUPPORT: "/api/v1/admin/support",
+  ADMIN_SEARCH: "/api/v1/admin/search",
   ADMIN_UPLOAD_CATEGORY_IMAGE: "/api/v1/admin/uploads/category-image",
   ADMIN_UPLOAD_PRODUCT_IMAGE: "/api/v1/admin/uploads/product-image",
   ADMIN_UPLOAD_DEAL_IMAGE: "/api/v1/admin/uploads/deal-image",
   CHAT: "/api/v1/chat",
+  CREATE_PAYMENT_INTENT: "/api/v1/payments/create-intent",
+  PRODUCT_REVIEWS: (productId: string) =>
+    `/api/v1/products/${productId}/reviews`,
+  REVIEWS: "/api/v1/reviews",
 };
