@@ -22,6 +22,9 @@ import { useAuth } from "@/lib/contexts/AuthContext";
 import { useCart } from "@/lib/contexts/CartContext";
 import { useWishlist } from "@/lib/contexts/WishlistContext";
 import { resolveImageUrl } from "@/lib/resolveImageUrl";
+import { formatNPR } from "@/lib/currency";
+import { ReviewSummary } from "@/lib/api/reviews";
+import ProductReviews, { StarRating } from "./ProductReviews";
 
 const sortOptions = ["Recommended", "Popular", "Newest"] as const;
 
@@ -63,6 +66,9 @@ export default function CategoryBrowsePage({
   const [cartMessage, setCartMessage] = useState("");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [detailQuantity, setDetailQuantity] = useState(1);
+  // Mirrors the live review summary so the modal header updates the moment a
+  // review is posted, without refetching the whole product list.
+  const [detailSummary, setDetailSummary] = useState<ReviewSummary | null>(null);
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);
@@ -127,11 +133,13 @@ export default function CategoryBrowsePage({
   const openProductDetails = (product: Product) => {
     setSelectedProduct(product);
     setDetailQuantity(1);
+    setDetailSummary(null);
   };
 
   const closeProductDetails = () => {
     setSelectedProduct(null);
     setDetailQuantity(1);
+    setDetailSummary(null);
   };
 
   const handleAddDetailCart = async () => {
@@ -332,7 +340,7 @@ export default function CategoryBrowsePage({
                     <div className="mt-4 flex items-center justify-between">
                       <div>
                         <p className="text-lg font-semibold text-green-800">
-                          ${product.price.toFixed(2)}
+                          {formatNPR(product.price)}
                         </p>
                       </div>
                       <button
@@ -451,12 +459,17 @@ export default function CategoryBrowsePage({
                   {selectedProduct.name}
                 </h2>
 
-                <div className="mt-4 flex items-center gap-2 text-amber-400">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <FiStar key={star} size={15} fill="currentColor" />
-                  ))}
+                <div className="mt-4 flex items-center gap-2">
+                  <StarRating
+                    rating={detailSummary?.average ?? selectedProduct.rating}
+                    size={15}
+                  />
                   <span className="text-sm font-medium text-slate-500">
-                    {selectedProduct.rating} ({selectedProduct.reviewsCount} reviews)
+                    {(detailSummary?.count ?? selectedProduct.reviewsCount) === 0
+                      ? "No reviews yet"
+                      : `${(detailSummary?.average ?? selectedProduct.rating).toFixed(1)} (${
+                          detailSummary?.count ?? selectedProduct.reviewsCount
+                        } reviews)`}
                   </span>
                 </div>
 
@@ -489,7 +502,7 @@ export default function CategoryBrowsePage({
                   <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                       <p className="text-3xl font-semibold text-green-800">
-                        ${selectedProduct.price.toFixed(2)}
+                        {formatNPR(selectedProduct.price)}
                       </p>
                     </div>
 
@@ -542,10 +555,16 @@ export default function CategoryBrowsePage({
                   </div>
 
                   <p className="mt-4 text-xs leading-5 text-slate-500">
-                    Total for {detailQuantity} {selectedUnit}: $
-                    {(selectedProduct.price * detailQuantity).toFixed(2)}
+                    Total for {detailQuantity} {selectedUnit}:{" "}
+                    {formatNPR(selectedProduct.price * detailQuantity)}
                   </p>
                 </div>
+
+                <ProductReviews
+                  key={selectedProduct.id}
+                  productId={selectedProduct.id}
+                  onSummaryChange={setDetailSummary}
+                />
               </div>
             </div>
           </div>
