@@ -8,11 +8,7 @@ export const OrderItemSchema = z.object({
   quantity: z.number().int().positive(),
 });
 
-export const PAYMENT_METHODS = [
-  "Card ending in 4242",
-  "Cash on delivery",
-  "FreshCart wallet",
-] as const;
+export const PAYMENT_METHODS = ["Card", "Cash on delivery"] as const;
 
 export const DELIVERY_TIME_SLOTS = [
   "09:00-11:00",
