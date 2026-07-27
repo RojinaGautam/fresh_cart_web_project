@@ -14,8 +14,13 @@ describe("adminUserSchema", () => {
   });
 
   it("accepts a payload with no password (edit mode)", () => {
-    const { password: _password, ...rest } = validPayload;
-    expect(adminUserSchema.safeParse(rest).success).toBe(true);
+    const withoutPassword = {
+      fullName: validPayload.fullName,
+      email: validPayload.email,
+      phoneNumber: validPayload.phoneNumber,
+      role: validPayload.role,
+    };
+    expect(adminUserSchema.safeParse(withoutPassword).success).toBe(true);
   });
 
   it("rejects an empty fullName", () => {

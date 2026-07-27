@@ -18,6 +18,7 @@ import { useAuth } from "@/lib/contexts/AuthContext";
 import { useCart } from "@/lib/contexts/CartContext";
 import { useWishlist } from "@/lib/contexts/WishlistContext";
 import { FALLBACK_PRODUCT_IMAGE, resolveImageUrl } from "@/lib/resolveImageUrl";
+import { formatNPR } from "@/lib/currency";
 import { quickDealPages } from "./deal-pages";
 
 export default function DealsPage() {
@@ -193,7 +194,7 @@ export default function DealsPage() {
                 <div className="mt-4 flex items-center justify-between">
                   <div>
                     <p className="text-lg font-bold text-green-700">
-                      ${deal.product?.price.toFixed(2)}
+                      {deal.product ? formatNPR(deal.product.price) : ""}
                     </p>
                   </div>
                   <button

@@ -28,6 +28,7 @@ export type Order = {
 export type CreateOrderPayload = {
   shippingAddress: string;
   paymentMethod: string;
+  paymentIntentId?: string;
   deliveryDate: string;
   deliveryTimeSlot: string;
 };

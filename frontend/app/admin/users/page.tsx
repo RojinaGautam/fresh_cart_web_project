@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { useUrlSearch } from "../../../lib/hooks/useUrlSearch";
 import { FiAlertTriangle, FiPlus, FiSearch } from "react-icons/fi";
 import {
   AdminUserFormPayload,
@@ -30,7 +31,7 @@ export default function AdminUsersPage() {
     total: 0,
     totalPages: 0,
   });
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useUrlSearch();
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [loading, setLoading] = useState(true);

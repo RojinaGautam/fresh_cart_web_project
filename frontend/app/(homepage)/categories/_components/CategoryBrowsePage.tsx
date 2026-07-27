@@ -6,11 +6,14 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   FiArrowLeft,
+  FiMinus,
   FiGrid,
   FiHeart,
+  FiPlus,
   FiSearch,
   FiShoppingCart,
   FiStar,
+  FiX,
 } from "react-icons/fi";
 import { Category } from "@/lib/api/categories";
 import { Product } from "@/lib/api/products";
@@ -19,6 +22,9 @@ import { useAuth } from "@/lib/contexts/AuthContext";
 import { useCart } from "@/lib/contexts/CartContext";
 import { useWishlist } from "@/lib/contexts/WishlistContext";
 import { resolveImageUrl } from "@/lib/resolveImageUrl";
+import { formatNPR } from "@/lib/currency";
+import { ReviewSummary } from "@/lib/api/reviews";
+import ProductReviews, { StarRating } from "./ProductReviews";
 
 const sortOptions = ["Recommended", "Popular", "Newest"] as const;
 
@@ -26,6 +32,11 @@ const sortParamFor = (sort: (typeof sortOptions)[number]) => {
   if (sort === "Popular") return "popular";
   if (sort === "Newest") return "newest";
   return undefined;
+};
+
+const formatUnit = (unit?: string) => {
+  const cleanUnit = unit?.replace("/", "").trim();
+  return cleanUnit || "item";
 };
 
 export default function CategoryBrowsePage({
@@ -53,6 +64,11 @@ export default function CategoryBrowsePage({
   const [categorySearchTerm, setCategorySearchTerm] = useState("");
   const [savedMessage, setSavedMessage] = useState("");
   const [cartMessage, setCartMessage] = useState("");
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [detailQuantity, setDetailQuantity] = useState(1);
+  // Mirrors the live review summary so the modal header updates the moment a
+  // review is posted, without refetching the whole product list.
+  const [detailSummary, setDetailSummary] = useState<ReviewSummary | null>(null);
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);
@@ -114,6 +130,38 @@ export default function CategoryBrowsePage({
     );
   };
 
+  const openProductDetails = (product: Product) => {
+    setSelectedProduct(product);
+    setDetailQuantity(1);
+    setDetailSummary(null);
+  };
+
+  const closeProductDetails = () => {
+    setSelectedProduct(null);
+    setDetailQuantity(1);
+    setDetailSummary(null);
+  };
+
+  const handleAddDetailCart = async () => {
+    if (!selectedProduct) return;
+
+    if (!isAuthenticated) {
+      requireLogin();
+      return;
+    }
+
+    const success = await addCartItem(selectedProduct.id, detailQuantity);
+    setCartMessage(
+      success
+        ? `${detailQuantity} ${selectedProduct.name} added to your cart.`
+        : `Unable to add ${selectedProduct.name} to cart.`,
+    );
+
+    if (success) {
+      closeProductDetails();
+    }
+  };
+
   const filteredCategories = useMemo(() => {
     const query = categorySearchTerm.trim().toLowerCase();
 
@@ -134,6 +182,7 @@ export default function CategoryBrowsePage({
   const pageDescription = browseAllProducts
     ? "Search fresh produce, bakery, dairy, household, and everyday grocery picks."
     : category.description;
+  const selectedUnit = selectedProduct ? formatUnit(selectedProduct.unit) : "item";
 
   return (
     <>
@@ -242,7 +291,8 @@ export default function CategoryBrowsePage({
               {products.map((product) => (
                 <article
                   key={product.id}
-                  className="group overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm ring-1 ring-transparent transition hover:-translate-y-1 hover:shadow-lg hover:ring-emerald-100"
+                  onClick={() => openProductDetails(product)}
+                  className="group cursor-pointer overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm ring-1 ring-transparent transition hover:-translate-y-1 hover:shadow-lg hover:ring-emerald-100"
                 >
                   <div className="relative h-48 overflow-hidden bg-[#eef2ea]">
                     <Image
@@ -261,8 +311,12 @@ export default function CategoryBrowsePage({
                     )}
                     <button
                       type="button"
-                      onClick={() => handleSaveProduct(product)}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        void handleSaveProduct(product);
+                      }}
                       className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white text-slate-500 shadow-sm transition hover:text-rose-500"
+                      aria-label={`Save ${product.name}`}
                     >
                       <FiHeart size={15} />
                     </button>
@@ -286,13 +340,17 @@ export default function CategoryBrowsePage({
                     <div className="mt-4 flex items-center justify-between">
                       <div>
                         <p className="text-lg font-semibold text-green-800">
-                          ${product.price.toFixed(2)}
+                          {formatNPR(product.price)}
                         </p>
                       </div>
                       <button
                         type="button"
-                        onClick={() => handleAddCart(product)}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          void handleAddCart(product);
+                        }}
                         className="flex h-9 w-9 items-center justify-center rounded-full bg-[#0d9f43] text-white shadow-sm transition hover:bg-[#087a35]"
+                        aria-label={`Add ${product.name} to cart`}
                       >
                         <FiShoppingCart size={15} />
                       </button>
@@ -353,6 +411,165 @@ export default function CategoryBrowsePage({
           )}
         </section>
       </div>
+
+      {selectedProduct && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-[#07180d]/60 px-4 py-6 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          aria-label={`${selectedProduct.name} details`}
+          onClick={closeProductDetails}
+        >
+          <div
+            className="max-h-[92vh] w-full max-w-5xl overflow-y-auto rounded-[28px] border border-[#d8e2d4] bg-[#f8fbf5] shadow-2xl"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="grid gap-0 lg:grid-cols-[1.05fr_0.95fr]">
+              <div className="relative min-h-[320px] overflow-hidden rounded-t-[28px] bg-[#e7eee3] lg:min-h-[560px] lg:rounded-l-[28px] lg:rounded-tr-none">
+                <Image
+                  src={resolveImageUrl(selectedProduct.image)}
+                  alt={selectedProduct.name}
+                  fill
+                  quality={95}
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  className="object-cover"
+                />
+                <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/55 to-transparent" />
+                {selectedProduct.tag && (
+                  <span className="absolute left-5 top-5 rounded-full bg-white px-4 py-2 text-xs font-semibold text-green-800 shadow-sm">
+                    {selectedProduct.tag}
+                  </span>
+                )}
+              </div>
+
+              <div className="relative p-6 sm:p-8">
+                <button
+                  type="button"
+                  onClick={closeProductDetails}
+                  className="absolute right-5 top-5 flex h-10 w-10 items-center justify-center rounded-full border border-[#d8e2d4] bg-white text-slate-500 transition hover:text-[#123821]"
+                  aria-label="Close product details"
+                >
+                  <FiX size={18} />
+                </button>
+
+                <p className="pr-12 text-xs font-semibold uppercase tracking-[0.18em] text-green-700">
+                  {selectedProduct.category?.title || category.title}
+                </p>
+                <h2 className="mt-3 pr-10 text-3xl font-semibold leading-tight text-[#112318] sm:text-4xl">
+                  {selectedProduct.name}
+                </h2>
+
+                <div className="mt-4 flex items-center gap-2">
+                  <StarRating
+                    rating={detailSummary?.average ?? selectedProduct.rating}
+                    size={15}
+                  />
+                  <span className="text-sm font-medium text-slate-500">
+                    {(detailSummary?.count ?? selectedProduct.reviewsCount) === 0
+                      ? "No reviews yet"
+                      : `${(detailSummary?.average ?? selectedProduct.rating).toFixed(1)} (${
+                          detailSummary?.count ?? selectedProduct.reviewsCount
+                        } reviews)`}
+                  </span>
+                </div>
+
+                <p className="mt-5 text-sm leading-6 text-slate-600">
+                  {selectedProduct.description ||
+                    "A fresh FreshCart grocery pick selected for easy weekly shopping, fast basket building, and reliable home delivery."}
+                </p>
+
+                <div className="mt-6 grid gap-3 sm:grid-cols-3">
+                  {[
+                    ["Stock", `${selectedProduct.stock} available`],
+                    ["Unit", selectedUnit],
+                    ["FreshCart", selectedProduct.isFeatured ? "Featured pick" : "Market pick"],
+                  ].map(([label, value]) => (
+                    <div
+                      key={label}
+                      className="rounded-2xl border border-[#d8e2d4] bg-white px-4 py-3"
+                    >
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">
+                        {label}
+                      </p>
+                      <p className="mt-1 text-sm font-semibold text-[#15251b]">
+                        {value}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-7 rounded-3xl border border-[#d8e2d4] bg-white p-5">
+                  <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <p className="text-3xl font-semibold text-green-800">
+                        {formatNPR(selectedProduct.price)}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center justify-between rounded-full bg-[#eef2ea] p-1">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setDetailQuantity((quantity) => Math.max(1, quantity - 1))
+                        }
+                        className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-[#123821] shadow-sm transition hover:bg-[#dfeadb]"
+                        aria-label="Decrease quantity"
+                      >
+                        <FiMinus size={16} />
+                      </button>
+                      <span className="min-w-14 text-center text-base font-semibold text-[#15251b]">
+                        {detailQuantity} {selectedUnit}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setDetailQuantity((quantity) =>
+                            Math.min(selectedProduct.stock || 99, quantity + 1),
+                          )
+                        }
+                        className="flex h-10 w-10 items-center justify-center rounded-full bg-[#123821] text-white shadow-sm transition hover:bg-[#0d2a19]"
+                        aria-label="Increase quantity"
+                      >
+                        <FiPlus size={16} />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+                    <button
+                      type="button"
+                      onClick={handleAddDetailCart}
+                      className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-[#0d9f43] px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#087a35]"
+                    >
+                      <FiShoppingCart size={17} />
+                      Add {detailQuantity} {selectedUnit} to cart
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => void handleSaveProduct(selectedProduct)}
+                      className="inline-flex items-center justify-center gap-2 rounded-full border border-[#d8e2d4] bg-[#f8fbf5] px-5 py-3 text-sm font-semibold text-[#123821] transition hover:bg-[#eef2ea]"
+                    >
+                      <FiHeart size={17} />
+                      Save item
+                    </button>
+                  </div>
+
+                  <p className="mt-4 text-xs leading-5 text-slate-500">
+                    Total for {detailQuantity} {selectedUnit}:{" "}
+                    {formatNPR(selectedProduct.price * detailQuantity)}
+                  </p>
+                </div>
+
+                <ProductReviews
+                  key={selectedProduct.id}
+                  productId={selectedProduct.id}
+                  onSummaryChange={setDetailSummary}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

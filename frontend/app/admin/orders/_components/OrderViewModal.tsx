@@ -7,6 +7,7 @@ import { Order } from "../../../../lib/api/orders";
 import { resolveImageUrl } from "../../../../lib/resolveImageUrl";
 import Modal from "../../_components/Modal";
 import { ORDER_STATUSES, statusLabel } from "./helpers";
+import { formatByPaymentMethod } from "../../../../lib/currency";
 
 export default function OrderViewModal({
   order,
@@ -78,7 +79,7 @@ export default function OrderViewModal({
                     <p className="text-xs text-slate-500">Qty {item.quantity}</p>
                   </div>
                   <p className="text-sm font-semibold text-slate-950">
-                    ${(item.price * item.quantity).toFixed(2)}
+                    {formatByPaymentMethod(item.price * item.quantity, order.paymentMethod)}
                   </p>
                 </div>
               ))}
@@ -87,13 +88,13 @@ export default function OrderViewModal({
 
           <div className="grid grid-cols-2 gap-2 rounded-2xl bg-slate-50 p-4 text-sm">
             <span className="text-slate-500">Subtotal</span>
-            <span className="text-right font-semibold text-slate-900">${order.subtotal.toFixed(2)}</span>
+            <span className="text-right font-semibold text-slate-900">{formatByPaymentMethod(order.subtotal, order.paymentMethod)}</span>
             <span className="text-slate-500">Delivery</span>
-            <span className="text-right font-semibold text-slate-900">${order.deliveryFee.toFixed(2)}</span>
+            <span className="text-right font-semibold text-slate-900">{formatByPaymentMethod(order.deliveryFee, order.paymentMethod)}</span>
             <span className="text-slate-500">Discount</span>
-            <span className="text-right font-semibold text-slate-900">-${order.discount.toFixed(2)}</span>
+            <span className="text-right font-semibold text-slate-900">-{formatByPaymentMethod(order.discount, order.paymentMethod)}</span>
             <span className="font-semibold text-slate-950">Total</span>
-            <span className="text-right font-bold text-emerald-700">${order.total.toFixed(2)}</span>
+            <span className="text-right font-bold text-emerald-700">{formatByPaymentMethod(order.total, order.paymentMethod)}</span>
           </div>
 
           <label className="block">

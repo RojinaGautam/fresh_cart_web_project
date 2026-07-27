@@ -22,7 +22,11 @@ export const buildDealPayload = (form: AdminDealFormPayload) => ({
   isActive: form.isActive,
 });
 
-export const getAdminDealsApi = async (params: { page: number; limit: number }) => {
+export const getAdminDealsApi = async (params: {
+  page: number;
+  limit: number;
+  search?: string;
+}) => {
   const response = await axiosInstance.get(API_ENDPOINTS.ADMIN_DEALS, {
     params,
   });

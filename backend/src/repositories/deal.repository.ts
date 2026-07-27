@@ -4,6 +4,7 @@ export type DealListQuery = {
   page: number;
   limit: number;
   activeOnly?: boolean;
+  search?: string;
 };
 
 export type PaginatedDeals = {
@@ -49,7 +50,19 @@ export class DealMongoRepository implements IDealRepository {
 
   async getPaginated(query: DealListQuery): Promise<PaginatedDeals> {
     const skip = (query.page - 1) * query.limit;
-    const filter = query.activeOnly ? { isActive: true } : {};
+    const search = query.search?.trim();
+
+    const filter: Record<string, unknown> = query.activeOnly
+      ? { isActive: true }
+      : {};
+
+    if (search) {
+      filter.$or = [
+        { title: { $regex: search, $options: "i" } },
+        { badge: { $regex: search, $options: "i" } },
+        { description: { $regex: search, $options: "i" } },
+      ];
+    }
 
     const [deals, total] = await Promise.all([
       DealModel.find(filter)

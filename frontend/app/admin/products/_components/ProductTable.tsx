@@ -11,6 +11,7 @@ import {
 import { AdminMeta } from "../../../../lib/api/admin/product";
 import { Product } from "../../../../lib/api/products";
 import { resolveImageUrl } from "../../../../lib/resolveImageUrl";
+import { formatNPR } from "../../../../lib/currency";
 
 export default function ProductTable({
   products,
@@ -107,7 +108,7 @@ export default function ProductTable({
                   {product.category?.title || "—"}
                 </td>
                 <td className="px-5 py-4 font-semibold text-slate-950">
-                  ${product.price.toFixed(2)}
+                  {formatNPR(product.price)}
                 </td>
                 <td className="px-5 py-4 font-medium text-slate-600">{product.stock}</td>
                 <td className="px-5 py-4">

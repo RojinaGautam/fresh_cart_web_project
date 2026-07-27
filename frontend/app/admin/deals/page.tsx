@@ -1,7 +1,8 @@
 "use client";
 
 import { FormEvent, useCallback, useEffect, useState } from "react";
-import { FiAlertTriangle, FiPlus } from "react-icons/fi";
+import { useUrlSearch } from "../../../lib/hooks/useUrlSearch";
+import { FiAlertTriangle, FiPlus, FiSearch } from "react-icons/fi";
 import {
   createAdminDealAction,
   deleteAdminDealAction,
@@ -20,6 +21,7 @@ import { emptyDealForm, getErrorMessage, validateDealForm } from "./_components/
 export default function AdminDealsPage() {
   const [deals, setDeals] = useState<Deal[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
+  const [search, setSearch] = useUrlSearch();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -36,7 +38,7 @@ export default function AdminDealsPage() {
       setLoading(true);
       setError("");
 
-      const response = await getAdminDealsAction({ page: 1, limit: 100 });
+      const response = await getAdminDealsAction({ page: 1, limit: 100, search });
 
       if (!response.success) {
         setError(response.message || "Unable to load deals");
@@ -49,7 +51,7 @@ export default function AdminDealsPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [search]);
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
@@ -169,18 +171,32 @@ export default function AdminDealsPage() {
             </p>
             <h1 className="mt-1 text-2xl font-semibold text-slate-950">Deal Management</h1>
             <p className="mt-1 text-sm font-medium text-slate-500">
-              Create, edit, and delete FreshCart promotional deals.
+              Search, create, edit, and delete FreshCart promotional deals.
             </p>
           </div>
 
-          <button
-            type="button"
-            onClick={openCreateModal}
-            className="flex h-11 items-center justify-center gap-2 rounded-xl bg-emerald-500 px-4 text-sm font-semibold text-white shadow-lg shadow-emerald-950/10 transition hover:bg-emerald-600 active:scale-[0.98]"
-          >
-            <FiPlus size={16} />
-            Create Deal
-          </button>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <div className="relative w-full sm:w-[320px]">
+              <FiSearch
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                size={16}
+              />
+              <input
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder="Search by title, badge, or description..."
+                className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-10 text-sm font-semibold outline-none transition focus:border-emerald-400 focus:bg-white focus:ring-4 focus:ring-emerald-100"
+              />
+            </div>
+            <button
+              type="button"
+              onClick={openCreateModal}
+              className="flex h-11 items-center justify-center gap-2 rounded-xl bg-emerald-500 px-4 text-sm font-semibold text-white shadow-lg shadow-emerald-950/10 transition hover:bg-emerald-600 active:scale-[0.98]"
+            >
+              <FiPlus size={16} />
+              Create Deal
+            </button>
+          </div>
         </div>
       </div>
 

@@ -19,3 +19,5 @@ export const GOOGLE_SMTP_PASSWORD: string =
   process.env.GOOGLE_SMTP_PASSWORD || "";
 
 export const GEMINI_API_KEY: string = process.env.GEMINI_API_KEY || "";
+
+export const STRIPE_SECRET_KEY: string = process.env.STRIPE_SECRET_KEY || "";

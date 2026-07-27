@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { useUrlSearch } from "../../../lib/hooks/useUrlSearch";
 import { FiAlertTriangle, FiPlus, FiSearch } from "react-icons/fi";
 import {
   createAdminProductAction,
@@ -21,7 +22,7 @@ export default function AdminProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [meta, setMeta] = useState<AdminMeta>({ page: 1, limit: 10, total: 0, totalPages: 0 });
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useUrlSearch();
   const [featuredOnly, setFeaturedOnly] = useState(false);
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);

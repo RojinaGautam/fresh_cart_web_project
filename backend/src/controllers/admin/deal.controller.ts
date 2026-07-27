@@ -20,6 +20,7 @@ export class AdminDealController {
       const { deals, meta } = await adminDealService.listDeals({
         page: req.query.page as string | undefined,
         limit: req.query.limit as string | undefined,
+        search: req.query.search as string | undefined,
       });
 
       return ApiResponseHelper.success(

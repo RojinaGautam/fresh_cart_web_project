@@ -16,7 +16,10 @@ import adminOrderRoutes from "./routes/admin/order.route";
 import supportRoutes from "./routes/support.route";
 import adminSupportRoutes from "./routes/admin/support.route";
 import adminUploadRoutes from "./routes/admin/upload.route";
+import adminSearchRoutes from "./routes/admin/search.route";
 import chatRoutes from "./routes/chat.route";
+import paymentRoutes from "./routes/payment.route";
+import { productReviewRouter, reviewRouter } from "./routes/review.route";
 
 const app: Application = express();
 
@@ -42,6 +45,8 @@ app.get("/", (req: Request, res: Response) => {
 app.use("/api/v1/auth", userRoutes);
 app.use("/api/v1/admin/users", adminUserRoutes);
 app.use("/api/v1/products", productRoutes);
+app.use("/api/v1/products/:productId/reviews", productReviewRouter);
+app.use("/api/v1/reviews", reviewRouter);
 app.use("/api/v1/admin/products", adminProductRoutes);
 app.use("/api/v1/categories", categoryRoutes);
 app.use("/api/v1/admin/categories", adminCategoryRoutes);
@@ -54,7 +59,9 @@ app.use("/api/v1/admin/orders", adminOrderRoutes);
 app.use("/api/v1/support", supportRoutes);
 app.use("/api/v1/admin/support", adminSupportRoutes);
 app.use("/api/v1/admin/uploads", adminUploadRoutes);
+app.use("/api/v1/admin/search", adminSearchRoutes);
 app.use("/api/v1/chat", chatRoutes);
+app.use("/api/v1/payments", paymentRoutes);
 
 app.use((req: Request, res: Response) => {
   return res.status(404).json({
