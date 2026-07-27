@@ -8,6 +8,12 @@ const categoryRepository = new CategoryMongoRepository();
 const dealRepository = new DealMongoRepository();
 const productRepository = new ProductMongoRepository();
 
+// Prices are stored and charged in USD (Stripe requirement), but FreshCart
+// is a Nepali storefront, so the assistant should talk about prices in NPR
+// to match what customers actually see on the site.
+const USD_TO_NPR_RATE = 133;
+const formatNPR = (usdAmount: number) => `NPR ${Math.round(usdAmount * USD_TO_NPR_RATE)}`;
+
 const buildSystemInstruction = async () => {
   const [categories, deals, featured] = await Promise.all([
     categoryRepository.getAll(),
@@ -29,7 +35,7 @@ const buildSystemInstruction = async () => {
 
   const featuredList =
     featured.products
-      .map((product) => `${product.name} - $${product.price.toFixed(2)}${product.unit || ""}`)
+      .map((product) => `${product.name} - ${formatNPR(product.price)}${product.unit || ""}`)
       .join("; ") || "no featured products right now";
 
   return `You are FreshCart Assistant, the official AI shopping assistant embedded in FreshCart, an online grocery delivery web app.
@@ -56,7 +62,7 @@ Current store snapshot:
 - Categories: ${categoryList}
 - Active deals: ${dealList}
 - Featured/trending products: ${featuredList}
-- Standard delivery fee is $3.50. Delivery windows are 9-11am, 12-2pm, and 4-6pm. Payment options are card, cash on delivery, or FreshCart wallet.
+- Standard delivery fee is ${formatNPR(3.5)}. Delivery windows are 9-11am, 12-2pm, and 4-6pm. Payment options are card (via Stripe) or cash on delivery.
 - To buy something, a customer browses a category or the dashboard, adds items to their cart, then checks out from the cart page with an address, payment method, and delivery slot. An account (with a verified email) is required to add to cart, save favorites, or check out.`;
 };
 
