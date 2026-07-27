@@ -24,6 +24,7 @@ import { Product } from "@/lib/api/products";
 import { getCategoriesAction } from "@/lib/actions/categories-action";
 import { getProductsAction } from "@/lib/actions/products-action";
 import { resolveImageUrl } from "@/lib/resolveImageUrl";
+import { formatNPR } from "@/lib/currency";
 
 const trendingPageSize = 4;
 
@@ -391,7 +392,7 @@ export default function DashboardPage() {
                   </p>
                   <div className="mt-3 flex items-center justify-between">
                     <p className="text-xs font-bold text-green-700">
-                      ${product.price.toFixed(2)}
+                      {formatNPR(product.price)}
                       <span className="text-[11px] font-semibold text-gray-400">
                         {product.unit}
                       </span>

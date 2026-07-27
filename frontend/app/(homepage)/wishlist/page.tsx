@@ -8,6 +8,7 @@ import { useCart } from "@/lib/contexts/CartContext";
 import { useWishlist } from "@/lib/contexts/WishlistContext";
 import ProtectedRoute from "@/app/_components/ProtectedRoute";
 import { resolveImageUrl } from "@/lib/resolveImageUrl";
+import { formatNPR } from "@/lib/currency";
 
 export default function WishlistPage() {
   const { wishlist, loading, removeItem } = useWishlist();
@@ -93,7 +94,7 @@ export default function WishlistPage() {
                 </h2>
                 <div className="mt-4 flex items-center justify-between">
                   <p className="text-lg font-semibold text-emerald-700">
-                    ${item.product.price.toFixed(2)}
+                    {formatNPR(item.product.price)}
                   </p>
                   <div className="flex gap-2">
                     <button

@@ -90,7 +90,7 @@ export default function ProductFormModal({
           </label>
 
           <label className="block">
-            <span className="text-xs font-semibold text-slate-700">Price</span>
+            <span className="text-xs font-semibold text-slate-700">Price (USD)</span>
             <input
               value={form.price}
               onChange={(event) => onChange({ ...form, price: event.target.value })}
