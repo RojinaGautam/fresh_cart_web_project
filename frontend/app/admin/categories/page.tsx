@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useCallback, useEffect, useState } from "react";
+import { useUrlSearch } from "../../../lib/hooks/useUrlSearch";
 import { FiAlertTriangle, FiPlus, FiSearch } from "react-icons/fi";
 import {
   createAdminCategoryAction,
@@ -17,7 +18,7 @@ import { emptyCategoryForm, getErrorMessage, validateCategoryForm } from "./_com
 
 export default function AdminCategoriesPage() {
   const [categories, setCategories] = useState<Category[]>([]);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useUrlSearch();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
