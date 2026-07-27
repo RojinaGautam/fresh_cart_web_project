@@ -16,7 +16,11 @@ type ApiError = {
   };
 };
 
-export const getAdminDealsAction = async (params: { page: number; limit: number }) => {
+export const getAdminDealsAction = async (params: {
+  page: number;
+  limit: number;
+  search?: string;
+}) => {
   try {
     return await getAdminDealsApi(params);
   } catch (error) {

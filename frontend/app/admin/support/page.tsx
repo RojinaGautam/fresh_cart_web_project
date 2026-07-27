@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useUrlSearch } from "../../../lib/hooks/useUrlSearch";
 import { FiAlertTriangle, FiSearch } from "react-icons/fi";
 import {
   getAdminSupportTicketsAction,
@@ -33,7 +34,7 @@ const getErrorMessage = (error: unknown, fallback: string) => {
 export default function AdminSupportPage() {
   const [tickets, setTickets] = useState<SupportTicket[]>([]);
   const [meta, setMeta] = useState<AdminMeta>({ page: 1, limit: 10, total: 0, totalPages: 0 });
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useUrlSearch();
   const [statusFilter, setStatusFilter] = useState("");
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
