@@ -13,6 +13,7 @@ const dealService = new DealService();
 export type AdminDealListParams = {
   page?: string;
   limit?: string;
+  search?: string;
 };
 
 export type AdminDealListResult = {
@@ -48,7 +49,11 @@ export class AdminDealService {
     const page = Math.max(Number(params.page) || 1, 1);
     const limit = Math.min(Math.max(Number(params.limit) || 10, 1), 50);
 
-    const result = await dealRepository.getPaginated({ page, limit });
+    const result = await dealRepository.getPaginated({
+      page,
+      limit,
+      search: params.search,
+    });
     const totalPages = Math.ceil(result.total / limit);
 
     return {
