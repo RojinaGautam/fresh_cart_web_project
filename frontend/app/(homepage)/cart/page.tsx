@@ -5,6 +5,12 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
+  CardElement,
+  Elements,
+  useElements,
+  useStripe,
+} from "@stripe/react-stripe-js";
+import {
   FiArrowLeft,
   FiCalendar,
   FiCreditCard,
@@ -19,8 +25,13 @@ import {
 import { useCart } from "@/lib/contexts/CartContext";
 import { useAuth } from "@/lib/contexts/AuthContext";
 import { createOrderAction } from "@/lib/actions/orders-action";
+import { createPaymentIntentAction } from "@/lib/actions/payment-action";
 import ProtectedRoute from "@/app/_components/ProtectedRoute";
 import { resolveImageUrl } from "@/lib/resolveImageUrl";
+import { getStripe } from "@/lib/stripe";
+import { formatByPaymentMethod } from "@/lib/currency";
+
+const PAYMENT_METHODS = ["Cash on delivery", "Card"] as const;
 
 const checkoutDetailsKey = "freshcart_checkout_details";
 
@@ -48,11 +59,24 @@ const formatUnit = (unit?: string) => {
 };
 
 export default function CartPage() {
+  return (
+    <ProtectedRoute>
+      <Elements stripe={getStripe()}>
+        <CartPageContent />
+      </Elements>
+    </ProtectedRoute>
+  );
+}
+
+function CartPageContent() {
   const router = useRouter();
+  const stripe = useStripe();
+  const elements = useElements();
   const { cart, updateItem, removeItem, refetch } = useCart();
   const { user } = useAuth();
   const [address, setAddress] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState("Card ending in 4242");
+  const [paymentMethod, setPaymentMethod] =
+    useState<(typeof PAYMENT_METHODS)[number]>("Cash on delivery");
   const [deliveryDate, setDeliveryDate] = useState("");
   const [deliveryTime, setDeliveryTime] = useState("09:00-11:00");
   const [placingOrder, setPlacingOrder] = useState(false);
@@ -73,7 +97,13 @@ export default function CartPage() {
       const details = JSON.parse(stored) as Partial<CheckoutDetails>;
       timeoutId = window.setTimeout(() => {
         setAddress(details.address || "");
-        setPaymentMethod(details.paymentMethod || "Card ending in 4242");
+        setPaymentMethod(
+          PAYMENT_METHODS.includes(
+            details.paymentMethod as (typeof PAYMENT_METHODS)[number],
+          )
+            ? (details.paymentMethod as (typeof PAYMENT_METHODS)[number])
+            : "Cash on delivery",
+        );
         const restoredDate = details.deliveryDate || "";
         setDeliveryDate(restoredDate >= minDeliveryDate ? restoredDate : "");
         setDeliveryTime(details.deliveryTime || "09:00-11:00");
@@ -140,9 +170,49 @@ export default function CartPage() {
 
     setPlacingOrder(true);
 
+    let paymentIntentId: string | undefined;
+
+    if (paymentMethod === "Card") {
+      if (!stripe || !elements) {
+        setCheckoutError("Payment form is still loading. Please try again.");
+        setPlacingOrder(false);
+        return;
+      }
+
+      const cardElement = elements.getElement(CardElement);
+
+      if (!cardElement) {
+        setCheckoutError("Please enter your card details.");
+        setPlacingOrder(false);
+        return;
+      }
+
+      const intentResponse = await createPaymentIntentAction();
+
+      if (!intentResponse.success) {
+        setCheckoutError(intentResponse.message || "Unable to start card payment.");
+        setPlacingOrder(false);
+        return;
+      }
+
+      const { error: stripeError, paymentIntent } = await stripe.confirmCardPayment(
+        intentResponse.data.clientSecret,
+        { payment_method: { card: cardElement } },
+      );
+
+      if (stripeError || !paymentIntent || paymentIntent.status !== "succeeded") {
+        setCheckoutError(stripeError?.message || "Card payment failed.");
+        setPlacingOrder(false);
+        return;
+      }
+
+      paymentIntentId = paymentIntent.id;
+    }
+
     const response = await createOrderAction({
       shippingAddress: address,
       paymentMethod,
+      paymentIntentId,
       deliveryDate,
       deliveryTimeSlot: deliveryTime,
     });
@@ -268,7 +338,7 @@ export default function CartPage() {
                   </div>
                   <div className="flex items-center justify-between gap-4 sm:flex-col sm:items-end">
                     <p className="text-lg font-semibold text-green-800">
-                      ${item.product.price.toFixed(2)}
+                      {formatByPaymentMethod(item.product.price, paymentMethod)}
                     </p>
                     <div className="flex items-center gap-2 rounded-full border border-[#d8e2d4] bg-[#f7faf4] p-1">
                       <button
@@ -308,22 +378,24 @@ export default function CartPage() {
             <div className="mt-5 space-y-3 text-sm">
               <div className="flex justify-between text-gray-600">
                 <span>Subtotal</span>
-                <span>${subtotal.toFixed(2)}</span>
+                <span>{formatByPaymentMethod(subtotal, paymentMethod)}</span>
               </div>
               <div className="flex justify-between text-gray-600">
                 <span>Delivery</span>
-                <span>${cartItems.length ? deliveryFee.toFixed(2) : "0.00"}</span>
+                <span>
+                  {formatByPaymentMethod(cartItems.length ? deliveryFee : 0, paymentMethod)}
+                </span>
               </div>
               <div className="flex justify-between text-gray-600">
                 <span>Fresh savings</span>
                 <span className="text-green-800">
-                  -${cartItems.length ? freshSavings.toFixed(2) : "0.00"}
+                  -{formatByPaymentMethod(cartItems.length ? freshSavings : 0, paymentMethod)}
                 </span>
               </div>
               <div className="border-t border-[#eef2ea] pt-3">
                 <div className="flex justify-between text-lg font-semibold text-[#15251b]">
                   <span>Total</span>
-                  <span>${total.toFixed(2)}</span>
+                  <span>{formatByPaymentMethod(total, paymentMethod)}</span>
                 </div>
               </div>
             </div>
@@ -408,15 +480,38 @@ export default function CartPage() {
                 <p className="text-sm text-gray-500">Choose how you want to pay.</p>
               </div>
             </div>
-            <select
-              value={paymentMethod}
-              onChange={(event) => setPaymentMethod(event.target.value)}
-              className="mt-4 w-full rounded-2xl border border-[#d8e2d4] bg-[#f7faf4] px-4 py-3 text-sm outline-none focus:border-emerald-400 focus:bg-white focus:ring-4 focus:ring-emerald-100"
-            >
-              <option>Card ending in 4242</option>
-              <option>Cash on delivery</option>
-              <option>FreshCart wallet</option>
-            </select>
+            <div className="mt-4 grid gap-2">
+              {PAYMENT_METHODS.map((method) => (
+                <button
+                  key={method}
+                  type="button"
+                  onClick={() => setPaymentMethod(method)}
+                  className={`rounded-2xl border px-4 py-3 text-left text-sm font-semibold transition ${
+                    paymentMethod === method
+                      ? "border-emerald-600 bg-[#173822] text-white"
+                      : "border-[#d8e2d4] bg-[#f7faf4] text-gray-600 hover:border-emerald-400"
+                  }`}
+                >
+                  {method}
+                </button>
+              ))}
+            </div>
+
+            {paymentMethod === "Card" && (
+              <div className="mt-3 rounded-2xl border border-[#d8e2d4] bg-[#f7faf4] px-4 py-3.5">
+                <CardElement
+                  options={{
+                    style: {
+                      base: {
+                        fontSize: "14px",
+                        color: "#15251b",
+                        "::placeholder": { color: "#9ca3af" },
+                      },
+                    },
+                  }}
+                />
+              </div>
+            )}
           </div>
 
           <div className="rounded-3xl border border-[#d8e2d4] bg-white p-5 shadow-sm">
