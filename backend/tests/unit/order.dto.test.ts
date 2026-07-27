@@ -2,7 +2,7 @@ import { CreateOrderDTO } from "../../src/dtos/order.dto";
 
 const basePayload = {
   shippingAddress: "123 Main St, Springfield",
-  paymentMethod: "Card ending in 4242" as const,
+  paymentMethod: "Cash on delivery" as const,
   deliveryTimeSlot: "09:00-11:00" as const,
 };
 
@@ -79,5 +79,29 @@ describe("CreateOrderDTO", () => {
     });
 
     expect(result.success).toBe(false);
+  });
+
+  it("rejects a Card payment without a paymentIntentId", () => {
+    const result = CreateOrderDTO.safeParse({
+      ...basePayload,
+      paymentMethod: "Card",
+      deliveryDate: toDateString(new Date()),
+    });
+
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0].path).toEqual(["paymentIntentId"]);
+    }
+  });
+
+  it("accepts a Card payment with a paymentIntentId", () => {
+    const result = CreateOrderDTO.safeParse({
+      ...basePayload,
+      paymentMethod: "Card",
+      paymentIntentId: "pi_test_123",
+      deliveryDate: toDateString(new Date()),
+    });
+
+    expect(result.success).toBe(true);
   });
 });

@@ -24,6 +24,7 @@ export interface IOrder extends Document {
   total: number;
   shippingAddress: string;
   paymentMethod: (typeof PAYMENT_METHODS)[number];
+  paymentIntentId?: string;
   deliveryDate: string;
   deliveryTimeSlot: (typeof DELIVERY_TIME_SLOTS)[number];
   status: (typeof ORDER_STATUSES)[number];
@@ -77,6 +78,8 @@ const OrderMongoSchema: Schema<IOrder> = new Schema(
       enum: PAYMENT_METHODS,
       required: true,
     },
+
+    paymentIntentId: { type: String },
 
     deliveryDate: { type: String, required: true },
 

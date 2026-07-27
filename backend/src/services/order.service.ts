@@ -7,6 +7,7 @@ import { CartMongoRepository } from "../repositories/cart.repository";
 import { OrderMongoRepository } from "../repositories/order.repository";
 import { UserMongoRepository } from "../repositories/user.repository";
 import { sendOrderConfirmationEmail } from "../uttils/mailer.util";
+import { stripeClient } from "../uttils/stripe.util";
 
 const orderRepository = new OrderMongoRepository();
 const cartRepository = new CartMongoRepository();
@@ -14,6 +15,45 @@ const userRepository = new UserMongoRepository();
 
 const DELIVERY_FEE = 3.5;
 const FRESH_SAVINGS_DISCOUNT = 2;
+
+export const calculateCartTotals = async (userId: string) => {
+  const cart = await cartRepository.getByUserId(userId);
+
+  if (!cart || cart.items.length === 0) {
+    throw new HttpException(400, "Cart is empty");
+  }
+
+  const items = cart.items
+    .filter((item) => item.product && typeof item.product === "object")
+    .map((item) => {
+      const product = item.product as unknown as IProduct;
+
+      return {
+        product: product._id,
+        name: product.name,
+        image: product.image,
+        price: product.price,
+        quantity: item.quantity,
+      };
+    });
+
+  if (items.length === 0) {
+    throw new HttpException(400, "Cart is empty");
+  }
+
+  const subtotal = Number(
+    items
+      .reduce((total, item) => total + item.price * item.quantity, 0)
+      .toFixed(2),
+  );
+  const deliveryFee = DELIVERY_FEE;
+  const discount = FRESH_SAVINGS_DISCOUNT;
+  const total = Number(
+    Math.max(subtotal + deliveryFee - discount, 0).toFixed(2),
+  );
+
+  return { items, subtotal, deliveryFee, discount, total };
+};
 
 export type PublicOrderItem = {
   product: string;
@@ -86,40 +126,26 @@ export class OrderService {
     userId: string,
     data: CreateOrderDTO,
   ): Promise<PublicOrder> {
-    const cart = await cartRepository.getByUserId(userId);
+    const { items, subtotal, deliveryFee, discount, total } =
+      await calculateCartTotals(userId);
 
-    if (!cart || cart.items.length === 0) {
-      throw new HttpException(400, "Cart is empty");
+    if (data.paymentMethod === "Card") {
+      const paymentIntent = await stripeClient.paymentIntents
+        .retrieve(data.paymentIntentId!)
+        .catch(() => null);
+
+      if (!paymentIntent) {
+        throw new HttpException(400, "Invalid or unknown payment");
+      }
+
+      if (paymentIntent.status !== "succeeded") {
+        throw new HttpException(400, "Payment has not been completed");
+      }
+
+      if (paymentIntent.amount !== Math.round(total * 100)) {
+        throw new HttpException(400, "Payment amount does not match order total");
+      }
     }
-
-    const items = cart.items
-      .filter((item) => item.product && typeof item.product === "object")
-      .map((item) => {
-        const product = item.product as unknown as IProduct;
-
-        return {
-          product: product._id,
-          name: product.name,
-          image: product.image,
-          price: product.price,
-          quantity: item.quantity,
-        };
-      });
-
-    if (items.length === 0) {
-      throw new HttpException(400, "Cart is empty");
-    }
-
-    const subtotal = Number(
-      items
-        .reduce((total, item) => total + item.price * item.quantity, 0)
-        .toFixed(2),
-    );
-    const deliveryFee = DELIVERY_FEE;
-    const discount = FRESH_SAVINGS_DISCOUNT;
-    const total = Number(
-      Math.max(subtotal + deliveryFee - discount, 0).toFixed(2),
-    );
 
     const order = await orderRepository.createOrder({
       userId: new mongoose.Types.ObjectId(userId),
@@ -131,6 +157,7 @@ export class OrderService {
       total,
       shippingAddress: data.shippingAddress,
       paymentMethod: data.paymentMethod,
+      paymentIntentId: data.paymentIntentId,
       deliveryDate: data.deliveryDate,
       deliveryTimeSlot: data.deliveryTimeSlot,
       status: "pending",
