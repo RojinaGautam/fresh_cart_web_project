@@ -4,7 +4,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
-  FiCheckCircle,
   FiChevronRight,
   FiEdit2,
   FiGift,
@@ -18,6 +17,7 @@ import {
 } from "react-icons/fi";
 import { Avatar } from "@/app/_components/AccountShell";
 import { FALLBACK_PRODUCT_IMAGE, resolveImageUrl } from "@/lib/resolveImageUrl";
+import { formatNPR, formatByPaymentMethod } from "@/lib/currency";
 import { useAuth } from "@/lib/contexts/AuthContext";
 import { useWishlist } from "@/lib/contexts/WishlistContext";
 import { Address, FreshCartUser } from "@/lib/api/auth";
@@ -71,6 +71,30 @@ export default function ProfilePage() {
   });
   const [savingAddress, setSavingAddress] = useState(false);
   const [addressError, setAddressError] = useState("");
+  const [copiedCode, setCopiedCode] = useState("");
+
+  const fallbackCopyText = (text: string) => {
+    const textarea = document.createElement("textarea");
+    textarea.value = text;
+    textarea.style.position = "fixed";
+    textarea.style.opacity = "0";
+    document.body.appendChild(textarea);
+    textarea.focus();
+    textarea.select();
+    document.execCommand("copy");
+    document.body.removeChild(textarea);
+  };
+
+  const handleCopyCoupon = async (code: string) => {
+    try {
+      await navigator.clipboard.writeText(code);
+    } catch {
+      fallbackCopyText(code);
+    }
+
+    setCopiedCode(code);
+    setTimeout(() => setCopiedCode(""), 2000);
+  };
 
   useEffect(() => {
     setAddresses(user?.addresses || []);
@@ -214,21 +238,10 @@ export default function ProfilePage() {
                   <h1 className="text-3xl font-semibold leading-tight">
                     {user.fullName}
                   </h1>
-                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white text-emerald-700">
-                    <FiCheckCircle size={14} />
-                  </span>
                 </div>
                 <p className="mt-2 text-sm font-medium text-emerald-50">
                   FreshCart customer since {formatDate(user.createdAt)}
                 </p>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-semibold text-white ring-1 ring-white/20">
-                    Verified Account
-                  </span>
-                  <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-semibold text-white ring-1 ring-white/20">
-                    Eco Star Support
-                  </span>
-                </div>
               </div>
             </div>
           </div>
@@ -471,7 +484,7 @@ export default function ProfilePage() {
                     {statusLabel[order.status] || order.status}
                   </span>
                   <p className="text-lg font-semibold text-emerald-700">
-                    ${order.total.toFixed(2)}
+                    {formatByPaymentMethod(order.total, order.paymentMethod)}
                   </p>
                 </div>
               </article>
@@ -508,7 +521,7 @@ export default function ProfilePage() {
                     {item.product.name}
                   </h3>
                   <p className="mt-1 text-sm font-semibold text-emerald-700">
-                    ${item.product.price.toFixed(2)}
+                    {formatNPR(item.product.price)}
                   </p>
                 </article>
               ))}
@@ -533,8 +546,12 @@ export default function ProfilePage() {
                   <p className="text-lg font-semibold text-emerald-800">
                     {coupon.code}
                   </p>
-                  <button className="rounded-xl bg-white px-3 py-2 text-xs font-semibold text-emerald-700 shadow-sm">
-                    Copy
+                  <button
+                    type="button"
+                    onClick={() => handleCopyCoupon(coupon.code)}
+                    className="rounded-xl bg-white px-3 py-2 text-xs font-semibold text-emerald-700 shadow-sm transition hover:bg-emerald-50"
+                  >
+                    {copiedCode === coupon.code ? "Copied!" : "Copy"}
                   </button>
                 </div>
                 <p className="mt-2 text-sm text-slate-600">{coupon.text}</p>

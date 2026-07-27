@@ -9,6 +9,7 @@ import {
 import { AdminMeta } from "../../../../lib/api/admin/order";
 import { Order } from "../../../../lib/api/orders";
 import { statusLabel, statusTone } from "./helpers";
+import { formatByPaymentMethod } from "../../../../lib/currency";
 
 export default function OrderTable({
   orders,
@@ -90,7 +91,7 @@ export default function OrderTable({
                   {order.items.length} item{order.items.length === 1 ? "" : "s"}
                 </td>
                 <td className="px-5 py-4 font-semibold text-slate-950">
-                  ${order.total.toFixed(2)}
+                  {formatByPaymentMethod(order.total, order.paymentMethod)}
                 </td>
                 <td className="px-5 py-4 font-medium text-slate-600">
                   {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : "—"}
