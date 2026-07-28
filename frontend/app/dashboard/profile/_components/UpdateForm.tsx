@@ -97,6 +97,9 @@ export default function UpdateForm({ user }: { user: FreshCartUser }) {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
           <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-full bg-green-100 text-3xl font-black text-green-700">
             {preview ? (
+              // next/image cannot optimise a local object URL from the file
+              // input, so a plain img is correct for this preview.
+              // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={preview}
                 alt="Profile preview"
