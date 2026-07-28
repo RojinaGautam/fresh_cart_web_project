@@ -45,6 +45,9 @@ export function Avatar({
 
   if (imageUrl) {
     return (
+      // The avatar is sized entirely by the caller's utility classes, which
+      // next/image cannot express without fixed width/height props.
+      // eslint-disable-next-line @next/next/no-img-element
       <img
         src={imageUrl}
         alt={user.fullName}

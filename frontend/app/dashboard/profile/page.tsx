@@ -62,6 +62,14 @@ export default function ProfilePage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [ordersTotal, setOrdersTotal] = useState(0);
   const [addresses, setAddresses] = useState<Address[]>(user?.addresses || []);
+  const [syncedAddresses, setSyncedAddresses] = useState(user?.addresses);
+
+  // Re-sync when the signed-in user's saved addresses change. Adjusting state
+  // during render is React's documented alternative to a syncing effect.
+  if (user?.addresses !== syncedAddresses) {
+    setSyncedAddresses(user?.addresses);
+    setAddresses(user?.addresses || []);
+  }
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [editingAddressId, setEditingAddressId] = useState("");
   const [addressForm, setAddressForm] = useState({
@@ -95,10 +103,6 @@ export default function ProfilePage() {
     setCopiedCode(code);
     setTimeout(() => setCopiedCode(""), 2000);
   };
-
-  useEffect(() => {
-    setAddresses(user?.addresses || []);
-  }, [user?.addresses]);
 
   useEffect(() => {
     void (async () => {

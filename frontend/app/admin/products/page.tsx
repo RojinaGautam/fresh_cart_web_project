@@ -2,6 +2,7 @@
 
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { useUrlSearch } from "../../../lib/hooks/useUrlSearch";
+import { toNPRInputValue } from "../../../lib/currency";
 import { FiAlertTriangle, FiPlus, FiSearch } from "react-icons/fi";
 import {
   createAdminProductAction,
@@ -100,7 +101,7 @@ export default function AdminProductsPage() {
       slug: product.slug,
       description: product.description || "",
       category: product.category?.id || "",
-      price: String(product.price),
+      price: toNPRInputValue(product.price),
       image: product.image,
       tag: product.tag || "",
       unit: product.unit,

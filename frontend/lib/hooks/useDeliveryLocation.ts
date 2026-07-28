@@ -67,7 +67,11 @@ export function useDeliveryLocation() {
   }, []);
 
   useEffect(() => {
-    requestLocation();
+    // requestLocation flips status to "loading" synchronously, which React's
+    // effect rules disallow directly in an effect body. Deferring by a tick
+    // keeps the locate-on-mount behaviour without the cascading render.
+    const timer = window.setTimeout(requestLocation, 0);
+    return () => window.clearTimeout(timer);
   }, [requestLocation]);
 
   return { location, status, requestLocation };

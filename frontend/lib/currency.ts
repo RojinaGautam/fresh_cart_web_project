@@ -8,6 +8,19 @@ export const USD_TO_NPR_RATE = 133;
 
 export const toNPR = (usdAmount: number) => usdAmount * USD_TO_NPR_RATE;
 
+/**
+ * Converts an NPR amount back to the USD value that is actually stored and
+ * charged. Kept to 4 decimal places so a whole-rupee price entered by an admin
+ * round-trips back to exactly the same rupee figure on screen — rounding to
+ * cents here would drift small prices by a rupee.
+ */
+export const fromNPR = (nprAmount: number) =>
+  Math.round((nprAmount / USD_TO_NPR_RATE) * 10000) / 10000;
+
+/** The whole-rupee figure to show in an admin price input. */
+export const toNPRInputValue = (usdAmount: number) =>
+  String(Math.round(toNPR(usdAmount)));
+
 export const formatNPR = (usdAmount: number) => {
   const npr = Math.round(toNPR(usdAmount));
   return `NPR ${npr.toLocaleString("en-US")}`;

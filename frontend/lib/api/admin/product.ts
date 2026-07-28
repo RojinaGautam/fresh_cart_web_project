@@ -1,6 +1,7 @@
 import axiosInstance from "../axios-instance";
 import { API_ENDPOINTS } from "../endpoints";
 import { Product } from "../products";
+import { fromNPR } from "../../currency";
 
 export type AdminProductFormPayload = {
   name: string;
@@ -29,7 +30,8 @@ export const buildProductPayload = (form: AdminProductFormPayload) => {
     slug: form.slug.trim(),
     description: form.description.trim() || undefined,
     category: form.category,
-    price: Number(form.price),
+    // Admins enter NPR; prices are stored and charged in USD.
+    price: fromNPR(Number(form.price)),
     image: form.image.trim(),
     tag: form.tag.trim() || undefined,
     unit: form.unit.trim(),

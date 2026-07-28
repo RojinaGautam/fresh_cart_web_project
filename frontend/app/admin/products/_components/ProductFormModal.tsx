@@ -90,11 +90,11 @@ export default function ProductFormModal({
           </label>
 
           <label className="block">
-            <span className="text-xs font-semibold text-slate-700">Price (USD)</span>
+            <span className="text-xs font-semibold text-slate-700">Price (NPR)</span>
             <input
               value={form.price}
               onChange={(event) => onChange({ ...form, price: event.target.value })}
-              placeholder="3.60"
+              placeholder="479"
               className="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm font-semibold outline-none transition focus:border-emerald-400 focus:bg-white focus:ring-4 focus:ring-emerald-100"
             />
           </label>
