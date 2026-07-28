@@ -16,4 +16,8 @@ backend/public/profiles/
 backend/uploads/profile/
 backend/coverage/
 frontend/coverage/
+
 *.tsbuildinfo
+
+.claude/
+.idea/
